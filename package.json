@@ -65,7 +65,7 @@
   "dependencies": {
     "brauhaus": ">=0.8 <1",
     "mongoose": "3.6.x",
-    "express": "~3.2",
+    "express": "~3.3",
     "json-gate": "~0.8.21",
     "optimist": "~0.6.0",
     "winston": "~0.7.2"
