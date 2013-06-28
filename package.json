@@ -1,0 +1,85 @@
+{
+  "name": "tapline",
+  "version": "0.1.0",
+  "description": "A homebrew beer recipe API server backed by MongoDB",
+  "homepage": "https://github.com/homebrewing/tapline",
+  "main": "lib/tapline.js",
+  "bin": {
+    "tapline": "./bin/tapline.js"
+  },
+  "scripts": {
+    "pretest": "./node_modules/coffee-script/bin/cake build",
+    "prepublish": "./node_modules/coffee-script/bin/cake build",
+    "prestart": "./node_modules/coffee-script/bin/cake build",
+    "start": "./bin/tapline.js",
+    "test": "./node_modules/coffee-script/bin/cake test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/homebrewing/tapline"
+  },
+  "bugs": {
+    "url": "https://github.com/homebrewing/tapline/issues"
+  },
+  "keywords": [
+    "beer",
+    "wine",
+    "mead",
+    "homebrew",
+    "homebrewer",
+    "homebrewing",
+    "brew",
+    "brewer",
+    "brewing",
+    "malt",
+    "sugar",
+    "hops",
+    "yeast",
+    "spice",
+    "bacteria",
+    "sour",
+    "funky",
+    "ferment",
+    "fermentable",
+    "fermenting",
+    "fermentation",
+    "calculate",
+    "calculator",
+    "calculation",
+    "recipe",
+    "instructions",
+    "javascript",
+    "coffeescript",
+    "api",
+    "interface",
+    "storage",
+    "mongo",
+    "mongodb"
+  ],
+  "author": {
+    "name": "Daniel G. Taylor",
+    "email": "danielgtaylor@gmail.com",
+    "url": "https://github.com/homebrewing"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "brauhaus": ">=0.8 <1",
+    "mongoose": "3.6.x",
+    "express": "~3.2",
+    "json-gate": "~0.8.21",
+    "optimist": "~0.6.0",
+    "winston": "~0.7.2"
+  },
+  "devDependencies": {
+    "coffee-script": ">=1.6 <2",
+    "coffeelint": ">=0.5.6 <1",
+    "mocha": ">=1.8 <2",
+    "supertest": "~0.7.0",
+    "sinon": "~1.7.3",
+    "istanbul": ">=0.1.34 <0.2",
+    "coveralls": ">=2.0.7 <3"
+  },
+  "engines": {
+    "node": ">=0.8"
+  }
+}
