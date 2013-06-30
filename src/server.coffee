@@ -16,7 +16,7 @@ app.configure ->
     app.use app.router
 
 # Define routes
-app.post '/v1/color/:format', colorController.convert
+app.get '/v1/convert/color.json', colorController.convert
 
 # Start the server
 exports.start = (listen, done) ->

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A homebrew beer recipe API server backed by MongoDB",
   "homepage": "https://github.com/homebrewing/tapline",
-  "main": "lib/tapline.js",
+  "main": "lib/main.js",
   "bin": {
     "tapline": "./bin/tapline.js"
   },

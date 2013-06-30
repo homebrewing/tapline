@@ -8,8 +8,8 @@ sinon = require 'sinon'
 describe 'Color Conversion', ->
     it 'Should respond with JSON on success', (done) ->
         request(app)
-            .post('/v1/color/srm')
-            .send(format: 'ebc', value: 39)
+            .get('/v1/convert/color.json')
+            .send(format: 'ebc', value: 39, outputFormat: 'srm')
             .expect('Content-Type', /json/)
             .expect(200)
             .end (err, res) ->
@@ -20,27 +20,32 @@ describe 'Color Conversion', ->
 
                 done()
 
-    it 'Should require a valid output format', (done) ->
+    it 'Should accept query parameters', (done) ->
         request(app)
-            .post('/v1/color/foo')
+            .get('/v1/convert/color.json?format=ebc&value=39&outputFormat=srm')
+            .expect(200, done)
+
+    it 'Should have a default output format', (done) ->
+        request(app)
+            .get('/v1/convert/color.json')
             .send(format: 'ebc', value: 39)
-            .expect(400, done)
+            .expect(200, done)
 
     it 'Should require a valid input format', (done) ->
         request(app)
-            .post('/v1/color/srm')
-            .send(value: 39)
+            .get('/v1/convert/color.json')
+            .send(value: 39, outputFormat: 'srm')
             .expect(400, done)
 
     it 'Should require an input value', (done) ->
         request(app)
-            .post('/v1/color/srm')
-            .send(format: 'ebc')
+            .get('/v1/convert/color.json')
+            .send(format: 'ebc', outputFormat: 'srm')
             .expect(400, done)
 
     it 'Should require input value to be a number', (done) ->
         request(app)
-            .post('/v1/color/srm')
+            .get('/v1/convert/color.json')
             .send(format: 'ebc', value: 'foo')
             .expect(400, done)
 
@@ -54,8 +59,8 @@ describe 'Color Conversion', ->
                 sinon.spy brauhaus, method
 
                 request(app)
-                    .post("/v1/color/srm")
-                    .send(format: format, value: 20)
+                    .get("/v1/convert/color.json")
+                    .send(format: format, value: 20, outputFormat: 'srm')
                     .expect(200)
                     .end (err, res) ->
                         if err then return done(err)
@@ -78,8 +83,8 @@ describe 'Color Conversion', ->
                 sinon.spy brauhaus, method
 
                 request(app)
-                    .post("/v1/color/#{format}")
-                    .send(format: 'srm', value: 20)
+                    .get('/v1/convert/color.json')
+                    .send(format: 'srm', value: 20, outputFormat: format)
                     .expect(200)
                     .end (err, res) ->
                         if err then return done(err)

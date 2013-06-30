@@ -1,5 +1,6 @@
 brauhaus = require 'brauhaus'
 jsonGate = require 'json-gate'
+util = require '../util'
 
 colorController = exports
 
@@ -12,14 +13,21 @@ convertSchema = jsonGate.createSchema
             enum: ['srm', 'ebc', 'lovibond']
             required: true
         value:
-            type: 'number'
+            type: ['number', 'string']
             minimum: 0
+            pattern: '^[\\d]+\\.?[\\d]*$'
             required: true
+        outputFormat:
+            type: 'string'
+            enum: ['srm', 'ebc', 'lovibond', 'name', 'rgb', 'css']
+            default: 'ebc'
 
 # Convert a color value given as SRM, EBC, or Lovibond into one of the
 # following: SRM, EBC, Lovibond, color name, RGB, or CSS string
 colorController.convert = (req, res) ->
-    convertSchema.validate req.body, (err, data) ->
+    params = util.extend {}, req.query, req.body
+
+    convertSchema.validate params, (err, data) ->
         if err then return res.send(400, err.toString())
 
         srm = switch data.format
@@ -30,7 +38,7 @@ colorController.convert = (req, res) ->
             when 'lovibond'
                 brauhaus.lovibondToSrm data.value
 
-        output = switch req.params.format
+        output = switch data.outputFormat
             when 'srm' then srm
             when 'ebc' then brauhaus.srmToEbc srm
             when 'lovibond' then brauhaus.srmToLovibond srm
@@ -39,10 +47,10 @@ colorController.convert = (req, res) ->
             when 'css' then brauhaus.srmToCss srm
 
         if output is undefined
-            return res.send(400, "Invalid output format '#{req.params.format}!")
+            return res.send(400, "Invalid output format '#{data.outputFormat}!")
 
-        req.info "Converted color from #{data.format} to #{req.params.format}"
+        req.info "Converted color from #{data.format} to #{data.outputFormat}"
 
         res.json
-            format: req.params.format
+            format: data.outputFormat
             value: output
