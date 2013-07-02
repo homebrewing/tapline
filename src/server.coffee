@@ -3,6 +3,7 @@ log = require './log'
 
 # Import controllers
 colorController = require './controllers/color'
+recipeController = require './controllers/recipe'
 
 # Setup HTTP server
 app = exports.app = express()
@@ -15,8 +16,16 @@ app.configure ->
     app.use require('./middleware/log')
     app.use app.router
 
+# =============
 # Define routes
+# =============
+
+# Public routes
 app.get '/v1/convert/color.json', colorController.convert
+app.get '/v1/convert/recipe.json', recipeController.convert
+
+# Authenticated routes
+# TODO
 
 # Start the server
 exports.start = (listen, done) ->
