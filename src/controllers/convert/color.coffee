@@ -1,6 +1,6 @@
 brauhaus = require 'brauhaus'
 jsonGate = require 'json-gate'
-util = require '../util'
+util = require '../../util'
 
 colorController = exports
 

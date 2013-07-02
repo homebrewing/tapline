@@ -2,8 +2,8 @@ express = require 'express'
 log = require './log'
 
 # Import controllers
-colorController = require './controllers/color'
-recipeController = require './controllers/recipe'
+colorController = require './controllers/convert/color'
+recipeController = require './controllers/convert/recipe'
 
 # Setup HTTP server
 app = exports.app = express()
