@@ -2,8 +2,9 @@ express = require 'express'
 log = require './log'
 
 # Import controllers
-colorController = require './controllers/convert/color'
-recipeController = require './controllers/convert/recipe'
+colorConvertController = require './controllers/convert/color'
+recipeConvertController = require './controllers/convert/recipe'
+recipeCalculateController = require './controllers/calculate/recipe'
 
 # Setup HTTP server
 app = exports.app = express()
@@ -21,8 +22,9 @@ app.configure ->
 # =============
 
 # Public routes
-app.post '/v1/convert/color.json', colorController.convert
-app.post '/v1/convert/recipe.json', recipeController.convert
+app.post '/v1/convert/color.json', colorConvertController.convert
+app.post '/v1/convert/recipe.json', recipeConvertController.convert
+app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
 
 # Authenticated routes
 # TODO

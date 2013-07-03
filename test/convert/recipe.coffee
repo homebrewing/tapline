@@ -2,6 +2,7 @@ assert = require 'assert'
 brauhaus = require 'brauhaus'
 request = require 'supertest'
 sinon = require 'sinon'
+util = require '../../lib/util'
 
 {app} = require '../../lib/server'
 
@@ -38,25 +39,21 @@ describe 'Recipe Conversion', ->
             .send(format: 'json', outputFormat: 'beerxml')
             .expect(400, done)
 
-    inputFormatMap =
-        'beerxml': 'fromBeerXml'
+    describe 'Input parsing', (done) ->
+        before ->
+            sinon.spy util, 'getRecipeList'
 
-    for format, method of inputFormatMap
-        do (format, method) ->
-            it "Should call Recipe.#{method} for input format '#{format}'", (done) ->
-                sinon.spy brauhaus.Recipe, method
+        it 'Should call getRecipeList to parse recipes', (done) ->
+            request(app)
+                .post('/v1/convert/recipe.json')
+                .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: 'json')
+                .expect(200)
+                .end (err, res) ->
+                    assert.ok util.getRecipeList.called
+                    done()
 
-                request(app)
-                    .post("/v1/convert/recipe.json")
-                    .send(format: format, recipes: ['<recipes><recipe><name>foo</name></recipe></recipes>'], outputFormat: 'json')
-                    .expect(200)
-                    .end (err, res) ->
-                        if err then return done(err)
-
-                        assert.ok brauhaus.Recipe[method].called
-
-                        brauhaus.Recipe[method].restore()
-                        done()
+        after ->
+            util.getRecipeList.restore()
 
     outputFormatMap =
         'json': 'toJSON'
@@ -64,17 +61,20 @@ describe 'Recipe Conversion', ->
 
     for format, method of outputFormatMap
         do (format, method) ->
-            it "Should call Recipe.prototype.#{method} for output format '#{format}'", (done) ->
-                sinon.spy brauhaus.Recipe.prototype, method
+            describe "Output format '#{format}'", ->
+                before ->
+                    sinon.spy brauhaus.Recipe.prototype, method
 
-                request(app)
-                    .post('/v1/convert/recipe.json')
-                    .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: format)
-                    .expect(200)
-                    .end (err, res) ->
-                        if err then return done(err)
+                it "Should call Recipe.#{method}", (done) ->
+                    request(app)
+                        .post('/v1/convert/recipe.json')
+                        .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: format)
+                        .expect(200)
+                        .end (err, res) ->
+                            if err then return done(err)
 
-                        assert.ok brauhaus.Recipe.prototype[method].called
+                            assert.ok brauhaus.Recipe.prototype[method].called
+                            done()
 
-                        brauhaus.Recipe.prototype[method].restore()
-                        done()
+                after ->
+                    brauhaus.Recipe.prototype[method].restore()
