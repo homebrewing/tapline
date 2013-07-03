@@ -23,14 +23,14 @@ task 'watch', 'Rebuild while watching for changes', ->
     run './node_modules/coffee-script/bin/coffee --watch -o lib --compile src'
 
 task 'test', 'Run library tests', ->
-    run './node_modules/mocha/bin/mocha --compilers coffee:coffee-script -R spec --colors test/*.coffee'
+    run './node_modules/mocha/bin/mocha -R spec --colors test'
 
 task 'updateCoverage', 'Generate and push unit test code coverage info to coveralls.io', ->
-    run './node_modules/istanbul/lib/cli.js cover -v ./node_modules/mocha/bin/_mocha -- test/*.js', ->
+    run './node_modules/istanbul/lib/cli.js cover -v ./node_modules/mocha/bin/_mocha -- test', ->
         run './node_modules/istanbul/lib/cli.js report lcovonly', ->
             console.log 'Trying to send coverage information to coveralls...'
             run './node_modules/coveralls/bin/coveralls.js <coverage/lcov.info'
 
 task 'coverage', 'Determine unit test code coverage', ->
-    run './node_modules/istanbul/lib/cli.js cover -v ./node_modules/mocha/bin/_mocha -- test/*.js', ->
+    run './node_modules/istanbul/lib/cli.js cover -v ./node_modules/mocha/bin/_mocha -- test', ->
         run './node_modules/istanbul/lib/cli.js report html'

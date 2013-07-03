@@ -1,5 +1,6 @@
 .DS_Store
 test/*.js
+test/convert/*.js
 node_modules
 npm-debug.log
 lib
