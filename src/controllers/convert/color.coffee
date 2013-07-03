@@ -12,11 +12,15 @@ convertSchema = jsonGate.createSchema
             type: 'string'
             enum: ['srm', 'ebc', 'lovibond']
             required: true
-        value:
-            type: ['number', 'string']
-            minimum: 0
-            pattern: '^[\\d]+\\.?[\\d]*$'
+        values:
+            type: 'array'
+            minItems: 1
+            maxItems: 25
             required: true
+            items:
+                type: 'number'
+                minimum: 0
+                required: true
         outputFormat:
             type: 'string'
             enum: ['srm', 'ebc', 'lovibond', 'name', 'rgb', 'css']
@@ -25,32 +29,30 @@ convertSchema = jsonGate.createSchema
 # Convert a color value given as SRM, EBC, or Lovibond into one of the
 # following: SRM, EBC, Lovibond, color name, RGB, or CSS string
 colorController.convert = (req, res) ->
-    params = util.extend {}, req.query, req.body
-
-    convertSchema.validate params, (err, data) ->
+    convertSchema.validate req.body, (err, data) ->
         if err then return res.send(400, err.toString())
 
         srm = switch data.format
             when 'srm'
-                data.value
+                data.values
             when 'ebc'
-                brauhaus.ebcToSrm data.value
+                (brauhaus.ebcToSrm value for value in data.values)
             when 'lovibond'
-                brauhaus.lovibondToSrm data.value
+                (brauhaus.lovibondToSrm value for value in data.values)
 
         output = switch data.outputFormat
             when 'srm' then srm
-            when 'ebc' then brauhaus.srmToEbc srm
-            when 'lovibond' then brauhaus.srmToLovibond srm
-            when 'name' then brauhaus.srmToName srm
-            when 'rgb' then brauhaus.srmToRgb srm
-            when 'css' then brauhaus.srmToCss srm
+            when 'ebc' then (brauhaus.srmToEbc value for value in srm)
+            when 'lovibond' then (brauhaus.srmToLovibond value for value in srm)
+            when 'name' then (brauhaus.srmToName value for value in srm)
+            when 'rgb' then (brauhaus.srmToRgb value for value in srm)
+            when 'css' then (brauhaus.srmToCss value for value in srm)
 
         if output is undefined
             return res.send(400, "Invalid output format '#{data.outputFormat}!")
 
-        req.info "Converted color from #{data.format} to #{data.outputFormat}"
+        req.info "Converted color(s) from #{data.format} to #{data.outputFormat}"
 
         res.json
             format: data.outputFormat
-            value: output
+            values: output

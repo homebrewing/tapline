@@ -9,44 +9,49 @@ describe 'Color Conversion', ->
     it 'Should respond with JSON on success', (done) ->
         request(app)
             .get('/v1/convert/color.json')
-            .send(format: 'ebc', value: 39, outputFormat: 'srm')
+            .send(format: 'ebc', values: [39], outputFormat: 'srm')
             .expect('Content-Type', /json/)
             .expect(200)
             .end (err, res) ->
                 if err then return done(err)
 
                 assert.ok res.body.format
-                assert.ok res.body.value
+                assert.ok res.body.values
 
                 done()
 
-    it 'Should accept query parameters', (done) ->
+    it 'Should convert multiple values', (done) ->
         request(app)
-            .get('/v1/convert/color.json?format=ebc&value=39&outputFormat=srm')
-            .expect(200, done)
+            .get('/v1/convert/color.json')
+            .send(format: 'ebc', values: [39, 25, 14], outputFormat: 'srm')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end (err, res) ->
+                assert.equal 3, res.body.values.length
+                done()
 
     it 'Should have a default output format', (done) ->
         request(app)
             .get('/v1/convert/color.json')
-            .send(format: 'ebc', value: 39)
+            .send(format: 'ebc', values: [39])
             .expect(200, done)
 
     it 'Should require a valid input format', (done) ->
         request(app)
             .get('/v1/convert/color.json')
-            .send(value: 39, outputFormat: 'srm')
+            .send(values: [39], outputFormat: 'srm')
             .expect(400, done)
 
-    it 'Should require an input value', (done) ->
+    it 'Should require at least one input value', (done) ->
         request(app)
             .get('/v1/convert/color.json')
             .send(format: 'ebc', outputFormat: 'srm')
             .expect(400, done)
 
-    it 'Should require input value to be a number', (done) ->
+    it 'Should require input values to be numbers', (done) ->
         request(app)
             .get('/v1/convert/color.json')
-            .send(format: 'ebc', value: 'foo')
+            .send(format: 'ebc', values: ["foo"])
             .expect(400, done)
 
     inputFormatMap =
@@ -60,7 +65,7 @@ describe 'Color Conversion', ->
 
                 request(app)
                     .get("/v1/convert/color.json")
-                    .send(format: format, value: 20, outputFormat: 'srm')
+                    .send(format: format, values: [20], outputFormat: 'srm')
                     .expect(200)
                     .end (err, res) ->
                         if err then return done(err)
@@ -84,7 +89,7 @@ describe 'Color Conversion', ->
 
                 request(app)
                     .get('/v1/convert/color.json')
-                    .send(format: 'srm', value: 20, outputFormat: format)
+                    .send(format: 'srm', values: [20], outputFormat: format)
                     .expect(200)
                     .end (err, res) ->
                         if err then return done(err)
