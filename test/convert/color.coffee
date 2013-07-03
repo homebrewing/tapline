@@ -3,7 +3,7 @@ brauhaus = require 'brauhaus'
 request = require 'supertest'
 sinon = require 'sinon'
 
-{app} = require '../lib/server'
+{app} = require '../../lib/server'
 
 describe 'Color Conversion', ->
     it 'Should respond with JSON on success', (done) ->
