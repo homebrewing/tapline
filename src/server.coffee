@@ -21,8 +21,8 @@ app.configure ->
 # =============
 
 # Public routes
-app.get '/v1/convert/color.json', colorController.convert
-app.get '/v1/convert/recipe.json', recipeController.convert
+app.post '/v1/convert/color.json', colorController.convert
+app.post '/v1/convert/recipe.json', recipeController.convert
 
 # Authenticated routes
 # TODO

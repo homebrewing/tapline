@@ -8,7 +8,7 @@ sinon = require 'sinon'
 describe 'Recipe Conversion', ->
     it 'Should respond with JSON on success', (done) ->
         request(app)
-            .get('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe.json')
             .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: 'beerxml')
             .expect('Content-Type', /json/)
             .expect(200)
@@ -22,19 +22,19 @@ describe 'Recipe Conversion', ->
 
     it 'Should have a default output format', (done) ->
         request(app)
-            .get('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe.json')
             .send(format: 'json', recipes: [{name: 'foo'}])
             .expect(200, done)
 
     it 'Should require a valid input format', (done) ->
         request(app)
-            .get('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe.json')
             .send(recipes: [{name: 'foo'}], outputFormat: 'beerxml')
             .expect(400, done)
 
     it 'Should require an input value', (done) ->
         request(app)
-            .get('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe.json')
             .send(format: 'json', outputFormat: 'beerxml')
             .expect(400, done)
 
@@ -47,7 +47,7 @@ describe 'Recipe Conversion', ->
                 sinon.spy brauhaus.Recipe, method
 
                 request(app)
-                    .get("/v1/convert/recipe.json")
+                    .post("/v1/convert/recipe.json")
                     .send(format: format, recipes: ['<recipes><recipe><name>foo</name></recipe></recipes>'], outputFormat: 'json')
                     .expect(200)
                     .end (err, res) ->
@@ -68,7 +68,7 @@ describe 'Recipe Conversion', ->
                 sinon.spy brauhaus.Recipe.prototype, method
 
                 request(app)
-                    .get('/v1/convert/recipe.json')
+                    .post('/v1/convert/recipe.json')
                     .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: format)
                     .expect(200)
                     .end (err, res) ->
