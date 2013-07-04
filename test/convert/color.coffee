@@ -60,20 +60,23 @@ describe 'Color Conversion', ->
 
     for format, method of inputFormatMap
         do (format, method) ->
-            it "Should call brauhaus.#{method} for input format '#{format}'", (done) ->
-                sinon.spy brauhaus, method
+            describe "Input format '#{format}'", ->
+                before ->
+                    sinon.spy brauhaus, method
 
-                request(app)
-                    .post("/v1/convert/color.json")
-                    .send(format: format, values: [20], outputFormat: 'srm')
-                    .expect(200)
-                    .end (err, res) ->
-                        if err then return done(err)
+                it "Should call brauhaus.#{method}", (done) ->
+                    request(app)
+                        .post("/v1/convert/color.json")
+                        .send(format: format, values: [20], outputFormat: 'srm')
+                        .expect(200)
+                        .end (err, res) ->
+                            if err then return done(err)
 
-                        assert.ok brauhaus[method].called
+                            assert.ok brauhaus[method].called
+                            done()
 
-                        brauhaus[method].restore()
-                        done()
+                after ->
+                    brauhaus[method].restore()
 
     outputFormatMap =
         'ebc': 'srmToEbc'
@@ -84,17 +87,20 @@ describe 'Color Conversion', ->
 
     for format, method of outputFormatMap
         do (format, method) ->
-            it "Should call brauhaus.#{method} for output format '#{format}'", (done) ->
-                sinon.spy brauhaus, method
+            describe "Output format '#{format}'", ->
+                before ->
+                    sinon.spy brauhaus, method
 
-                request(app)
-                    .post('/v1/convert/color.json')
-                    .send(format: 'srm', values: [20], outputFormat: format)
-                    .expect(200)
-                    .end (err, res) ->
-                        if err then return done(err)
+                it "Should call brauhaus.#{method}", (done) ->
+                    request(app)
+                        .post('/v1/convert/color.json')
+                        .send(format: 'srm', values: [20], outputFormat: format)
+                        .expect(200)
+                        .end (err, res) ->
+                            if err then return done(err)
 
-                        assert.ok brauhaus[method].called
+                            assert.ok brauhaus[method].called
+                            done()
 
-                        brauhaus[method].restore()
-                        done()
+                after ->
+                    brauhaus[method].restore()
