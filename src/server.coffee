@@ -3,6 +3,7 @@ log = require './log'
 
 # Import controllers
 colorConvertController = require './controllers/convert/color'
+durationConvertController = require './controllers/convert/duration'
 recipeConvertController = require './controllers/convert/recipe'
 recipeCalculateController = require './controllers/calculate/recipe'
 
@@ -23,6 +24,7 @@ app.configure ->
 
 # Public routes
 app.post '/v1/convert/color.json', colorConvertController.convert
+app.post '/v1/convert/duration.json', durationConvertController.convert
 app.post '/v1/convert/recipe.json', recipeConvertController.convert
 app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
 
