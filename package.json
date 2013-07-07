@@ -69,7 +69,8 @@
     "express": "~3.3",
     "json-gate": "~0.8.21",
     "optimist": "~0.6.0",
-    "winston": "~0.7.2"
+    "winston": "~0.7.2",
+    "bcryptjs": "~0.7.7"
   },
   "devDependencies": {
     "coffee-script": ">=1.6 <2",

@@ -7,6 +7,8 @@ durationConvertController = require './controllers/convert/duration'
 recipeConvertController = require './controllers/convert/recipe'
 recipeCalculateController = require './controllers/calculate/recipe'
 
+userController = require './controllers/user'
+
 # Setup HTTP server
 app = exports.app = express()
 app.configure ->
@@ -27,6 +29,11 @@ app.post '/v1/convert/color.json', colorConvertController.convert
 app.post '/v1/convert/duration.json', durationConvertController.convert
 app.post '/v1/convert/recipe.json', recipeConvertController.convert
 app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
+
+app.get '/v1/users.json', userController.list
+app.post '/v1/users.json', userController.create
+app.put '/v1/users.json', userController.update
+app.delete '/v1/users.json', userController.delete
 
 # Authenticated routes
 # TODO
