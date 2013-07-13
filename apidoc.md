@@ -191,16 +191,22 @@ Web Flow
 --------
 Coming soon. For now you can manually create authorizations using the section below.
 
+Scopes
+------
+OAuth2 scopes are a way to control access to resources. They allow a user to give only specific permissions to a third party client, such as modifying recipes but not giving access to the user's email address. The following scopes are available in Tapline:
+
+ * Coming soon!
+
 Authorizations API
 ------------------
-The authorizations API is a bit different from other calls in Tapline, in that it requires HTTP basic auth along with third party client information for every request instead of using OAuth bearer tokens.
+The authorizations API is a bit different from other calls in Tapline, in that it requires HTTP basic auth along with third party client information for every request instead of using OAuth bearer tokens. This means that the authorizations API requires that you temporarily collect a user's name and password until you can get an OAuth2 bearer token.
 
-### Create an Authorization
-Create a new authorization for a third party client and a specific user. The response will give you an OAuth bearer token to use for authorized API requests on behalf of that user.
+### Create an Authorization Token
+Create a new authorization for a third party client and a specific user. The response will give you an OAuth bearer token to use for authorized API requests on behalf of that user with the given scopes, if any. The request __must__ use HTTP basic auth (the `Authorization` header below) using the user's `name` and `password`, as well as including the `clientId` and `clientSecret` of the registered third party client.
 
 #### Request
 ```http
-POST /v1/authorizations.json
+POST /v1/authorizations.json HTTP/1.1
 Content-Type: application/json
 Authorization: Basic ZGFuaWVsOmFiYzEyMw==
 
@@ -256,7 +262,7 @@ When a user account is created
 
 ### Request
 ```http
-POST /v1/users.json
+POST /v1/users.json HTTP/1.1
 Content-Type: application/json
 
 {

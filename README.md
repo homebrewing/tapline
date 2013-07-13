@@ -6,12 +6,12 @@ Tapline
 A beer, wine, and mead homebrew API server based on [Brauhaus](https://github.com/homebrewing/brauhausjs). Features include:
 
  * Anonymous, public access to homebrewing calculators and converters
+ * Account registration, authentication & authorization
  * Persistent storage via [MongoDB](http://www.mongodb.org/)
  * Open source, MIT licensed
 
 Planned features include:
 
- * Account registration, authentication & authorization
  * Recipe storage & retrieval
  * Recipe search
  * Recipe history (like Github for beer)
