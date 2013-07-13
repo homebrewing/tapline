@@ -70,7 +70,10 @@
     "json-gate": "~0.8.21",
     "optimist": "~0.6.0",
     "winston": "~0.7.2",
-    "bcryptjs": "~0.7.7"
+    "bcryptjs": "~0.7.7",
+    "passport-http-bearer": "~0.2.1",
+    "passport-http": "~0.2.2",
+    "passport": "~0.1.17"
   },
   "devDependencies": {
     "coffee-script": ">=1.6 <2",

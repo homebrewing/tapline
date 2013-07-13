@@ -36,7 +36,7 @@ X-Response-Time: 4ms
 
 {
     "format": "display",
-    values: [
+    "values": [
         "4 days 1 hour 3 minutes", 
         "1 day 23 hours 2 minutes", 
         "2 days 12 hours"
@@ -176,8 +176,71 @@ X-Response-Time: 11ms
 
 Authentication & Authorization
 ==============================
+There are three types of requests in Tapline:
 
-TODO: Write me!
+ 1. Public (no authentication)
+ 2. Requests for authorization (HTTP basic auth)
+ 3. Requests on behalf of a user (OAuth bearer token)
+
+Public requests need no authentication and do not fall within this and the following sections. Authentication and authorization in Tapline allow third party __clients__ to make API requests _on behalf_ of __users__ using an opaque _token_. In order to get such a token, a third party client has two options:
+
+ 1. Web flow (TODO)
+ 2. Authorizations API
+
+Web Flow
+--------
+Coming soon. For now you can manually create authorizations using the section below.
+
+Authorizations API
+------------------
+The authorizations API is a bit different from other calls in Tapline, in that it requires HTTP basic auth along with third party client information for every request instead of using OAuth bearer tokens.
+
+### Create an Authorization
+Create a new authorization for a third party client and a specific user. The response will give you an OAuth bearer token to use for authorized API requests on behalf of that user.
+
+#### Request
+```http
+POST /v1/authorizations.json
+Content-Type: application/json
+Authorization: Basic ZGFuaWVsOmFiYzEyMw==
+
+{
+    "clientId": "abc123",
+    "clientSecret": "some-secret",
+    "scopes": [
+        "user",
+        "recipe"
+    ]
+}
+```
+
+#### Response
+```http
+HTTP/1.1 201 Created
+Content-Type: application/json
+X-Request-ID: 64a359b2
+X-Response-Time: 100ms
+
+{
+    "clientId": "abc123",
+    "created": "2013-07-11T17:28:52.787Z",
+    "id": "51deeb54763ce70000000001",
+    "scopes": [
+        "user",
+        "recipe"
+    ],
+    "token": "b608d4b097c838067aba07eb9206faab1bf4b446",
+    "userId": "51de54131084ffeef8000001"
+}
+```
+
+#### Errors
+
+| Code | Description                            |
+| ---- | -------------------------------------- |
+| 400  | Invalid request arguments              |
+| 401  | Invalid user/password or client/secret |
+| 500  | Internal server error                  |
 
 User Accounts
 =============
@@ -185,7 +248,7 @@ User accounts are the owners of data within Tapline. Users own recipes, brew day
 
 Registering a New User
 ----------------------
-This method __does not require authentication or authorization__. A new user can be registered with the service using an `email`, `name` and `password`.
+This method __does not require authentication or authorization__. A new user can be registered with the service using an only an `email`, `name` and `password`.
 
 The user `name` should be made up of lowercase letters, numbers, `-` and `_` so that it is safe to be used in URLs.
 
@@ -205,7 +268,7 @@ Content-Type: application/json
 
 ### Response
 ```http
-HTTP/1.1 200 OK
+HTTP/1.1 201 Created
 Content-Type: application/json
 X-Request-ID: 60b03d63
 X-Response-Time: 240ms

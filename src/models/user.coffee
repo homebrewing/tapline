@@ -1,3 +1,4 @@
+bcrypt = require 'bcryptjs'
 mongoose = require 'mongoose'
 util = require '../util'
 
@@ -34,9 +35,9 @@ UserSchema.methods =
     # Authenticate a user, taking a password and a function (err, authenticated)
     # which will be called with authenticated=true if the password is correct.
     authenticate: (password, done) ->
-        if not @confirmed then return done('Unconfirmed email address!', false)
+        #if not @confirmed then return done('Unconfirmed email address!', false)
 
-        bcrypt.check password, @passwordHash, (err, res) =>
+        bcrypt.compare password, @passwordHash, (err, res) =>
             if err then return done(err, false)
             done(null, res)
 

@@ -86,7 +86,7 @@ userController.create = (req, res) ->
             u.save (err, saved) ->
                 if err then return res.send(500, err.toString())
 
-                res.json saved
+                res.json 201, saved
 
 userController.update = (req, res) ->
     updateSchema.validate req.body, (err, data) ->

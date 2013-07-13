@@ -1,5 +1,13 @@
 express = require 'express'
 log = require './log'
+passport = require 'passport'
+
+# Authentication strategies
+{BasicStrategy} = require 'passport-http'
+BearerStrategy = require('passport-http-bearer').Strategy
+
+Authorization = require './models/authorization'
+User = require './models/user'
 
 # Import controllers
 colorConvertController = require './controllers/convert/color'
@@ -7,9 +15,12 @@ durationConvertController = require './controllers/convert/duration'
 recipeConvertController = require './controllers/convert/recipe'
 recipeCalculateController = require './controllers/calculate/recipe'
 
+authController = require './controllers/authorizations'
 userController = require './controllers/user'
 
+# =================
 # Setup HTTP server
+# =================
 app = exports.app = express()
 app.configure ->
     app.disable 'x-powered-by'
@@ -18,11 +29,40 @@ app.configure ->
     app.use express.methodOverride()
     app.use require('./middleware/requestId')
     app.use require('./middleware/log')
+    app.use passport.initialize()
+    #app.use passport.session()
     app.use app.router
+
+# =====================
+# Setup Auth Strategies
+# =====================
+passport.use new BasicStrategy (username, password, done) ->
+    User.findOne {name: username}, (err, user) ->
+        if err then return done(err)
+        if not user then return done(null, false)
+
+        user.authenticate password, (err, success) ->
+            if err then return done(err)
+            if not success then return done('Invalid password')
+
+            done(null, user)
+
+passport.use new BearerStrategy (token, done) ->
+    Authorization.findOne {token}, (err, auth) ->
+        if err then return done(err)
+        if not auth then return done(null, false)
+
+        User.findById auth.userId, (err, user) ->
+            if err then return done(err)
+            if not user then return done(null, false)
+
+            done(null, user, auth.scopes)
 
 # =============
 # Define routes
 # =============
+authBasic = passport.authenticate('basic', {session: false})
+authBearer = passport.authenticate('bearer', {session: false})
 
 # Public routes
 app.post '/v1/convert/color.json', colorConvertController.convert
@@ -30,13 +70,16 @@ app.post '/v1/convert/duration.json', durationConvertController.convert
 app.post '/v1/convert/recipe.json', recipeConvertController.convert
 app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
 
-app.get '/v1/users.json', userController.list
 app.post '/v1/users.json', userController.create
-app.put '/v1/users.json', userController.update
-app.delete '/v1/users.json', userController.delete
 
-# Authenticated routes
-# TODO
+# Basic authenticated routes
+app.get '/v1/authorizations.json', authBasic, authController.list
+app.post '/v1/authorizations.json', authBasic, authController.create
+
+# OAuth2 Authenticated routes
+app.get '/v1/users.json', authBearer, userController.list
+app.put '/v1/users.json', authBearer, userController.update
+app.delete '/v1/users.json', authBearer, userController.delete
 
 # Start the server
 exports.start = (listen, done) ->
