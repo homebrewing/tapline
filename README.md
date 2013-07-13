@@ -22,6 +22,12 @@ Planned features include:
 
 Tapline was developed with and for [Malt.io](http://www.malt.io/), a community website for homebrewers to create recipes and share their love of homebrewing beer.
 
+Documentation
+-------------
+The Tapline API documentation is in a separate document to keep the reference as slim as possible. For now it is stored in a static file, but in the future may include a way to do example calls.
+
+ * Read the [Tapline API documentation](https://github.com/homebrewing/tapline/blob/master/apidoc.md)
+
 Dependencies
 ------------
 Please ensure that you have the following installed / running:

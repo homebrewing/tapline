@@ -1,0 +1,232 @@
+Overview
+========
+Tapline provides an API server for homebrewers that is split into two parts: public anonymous calls to various converters & calculators, and authenticated calls to access the majority of the APIs. Tapline can be accessed at the following URL:
+
+ * https://api.malt.io/
+
+Calculators & Converters
+========================
+Public, anonymous API methods to convert between various representations and to calculate homebrewing information.
+
+Converting Durations
+--------------------
+Converts up to 25 durations from a number of minutes or a string representation into a number of minutes (`outputFormat` is `minutes`) or a human-readable string format (`outputFormat` is `display`). An optional `approximate` parameter will approximate the duration if `outputFormat` is `display`, e.g. a value of `1` would display hours but truncate minutes if `65` minutes are input. The `approximate` parameter rounds the last displayed value.
+
+### Request
+```http
+POST /v1/convert/duration.json HTTP/1.1
+Content-Type: application/json
+
+{
+    "values": [
+        5823,
+        "1 day 23 hours 2min",
+        "60hrs"
+    ],
+    "outputFormat": "display"
+}
+```
+
+### Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Request-ID: ahsdf4h6
+X-Response-Time: 4ms
+
+{
+    "format": "display",
+    values: [
+        "4 days 1 hour 3 minutes", 
+        "1 day 23 hours 2 minutes", 
+        "2 days 12 hours"
+    ]
+}
+```
+
+### Errors
+
+| Code | Description               |
+| ---- | ------------------------- |
+| 400  | Invalid request arguments |
+| 500  | Internal server error     |
+
+Converting Colors
+-----------------
+Converts up to 25 colors from SRM, EBC, or Lovibond into SRM, EBC, Lovibond, RGB, CSS color string, or human-readable color name. Valid input formats: `srm`, `ebc`, `lovibond`. Valid output formats: `srm`, `ebc`, `lovibond`, `rgb`, `css`, `name`.
+
+### Request
+```http
+POST /v1/convert/color.json HTTP/1.1
+Content-Type: application/json
+
+{
+    "format": "srm",
+    "values": [
+        4,
+        9,
+        15,
+        20,
+        28
+    ]
+    "outputFormat": "ebc"
+}
+```
+
+### Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Request-ID: fa28de76
+X-Response-Time: 2ms
+
+{
+    "format": "ebc",
+    "values": [
+        7.88,
+        17.73,
+        29.55,
+        39.4,
+        55.16
+    ]
+}
+```
+
+### Errors
+
+| Code | Description               |
+| ---- | ------------------------- |
+| 400  | Invalid request arguments |
+| 500  | Internal server error     |
+
+Converting Recipes
+------------------
+Converts up to 10 recipes from/to a Brauhaus JSON representation and BeerXML. Valid input and output formats are `json` and `beerxml`.
+
+### Request
+```http
+POST /v1/convert/recipe.json HTTP/1.1
+Content-Type: application/json
+
+{
+    "format": "beerxml",
+    "recipes": [
+        "<recipes><recipe><version>1</version><name>Test</name><fermentables><fermentable><name>Pale extract</name><amount>3.5</amount><yield>75</yield></fermentable></fermentables></recipe></recipes>"
+    ],
+    "outputFormat": "json"
+}
+```
+
+### Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Request-ID: 8145460e
+X-Response-Time: 11ms
+
+{
+    "format": "json", 
+    "recipes": [
+        {
+            "agingDays": 14, 
+            "agingTemp": 20, 
+            "author": "Anonymous Brewer", 
+            "batchSize": 20, 
+            "boilSize": 10, 
+            "bottlingPressure": 0, 
+            "bottlingTemp": 0, 
+            "description": "Recipe description", 
+            "fermentables": [
+                {
+                    "color": 2, 
+                    "late": false, 
+                    "name": "Pale extract", 
+                    "weight": 3.5, 
+                    "yield": 75
+                }
+            ], 
+            "ibuMethod": "tinseth", 
+            "mash": null, 
+            "mashEfficiency": 75, 
+            "name": "Test", 
+            "primaryDays": 14, 
+            "primaryTemp": 20, 
+            "secondaryDays": 0, 
+            "secondaryTemp": 0, 
+            "servingSize": 0.355, 
+            "spices": [], 
+            "steepEfficiency": 50, 
+            "steepTime": 20, 
+            "style": null, 
+            "tertiaryDays": 0, 
+            "tertiaryTemp": 0, 
+            "yeast": []
+        }
+    ]
+}
+
+```
+
+### Errors
+
+| Code | Description               |
+| ---- | ------------------------- |
+| 400  | Invalid request arguments |
+| 500  | Internal server error     |
+
+Authentication & Authorization
+==============================
+
+TODO: Write me!
+
+User Accounts
+=============
+User accounts are the owners of data within Tapline. Users own recipes, brew days, follow other users, etc.
+
+Registering a New User
+----------------------
+This method __does not require authentication or authorization__. A new user can be registered with the service using an `email`, `name` and `password`.
+
+The user `name` should be made up of lowercase letters, numbers, `-` and `_` so that it is safe to be used in URLs.
+
+When a user account is created 
+
+### Request
+```http
+POST /v1/users.json
+Content-Type: application/json
+
+{
+    "email": "user@domain.com",
+    "name": "my_cool_username",
+    "password": "myP@ssW0rD"
+}
+```
+
+### Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Request-ID: 60b03d63
+X-Response-Time: 240ms
+
+{
+    "confirmed": false, 
+    "created": "2013-07-09T04:19:13.213Z", 
+    "id": "51db8f41dd6939ffb9000001", 
+    "name": "my_cool_username", 
+    "recipeCount": 0
+}
+```
+
+### Errors
+
+| Code | Description                                   |
+| ---- | --------------------------------------------- |
+| 400  | Invalid request arguments, duplicate username |
+| 500  | Internal server error                         |
+
+Recipes
+=======
+
+TODO!
