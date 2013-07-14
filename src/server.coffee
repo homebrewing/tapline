@@ -56,13 +56,13 @@ passport.use new BearerStrategy (token, done) ->
             if err then return done(err)
             if not user then return done(null, false)
 
-            done(null, user, auth.scopes)
+            done(null, user, {scopes: auth.scopes})
 
 # =============
 # Define routes
 # =============
 authBasic = passport.authenticate('basic', {session: false})
-authBearer = passport.authenticate('bearer', {session: false})
+authBearer = require './middleware/bearer'
 
 # Public routes
 app.post '/v1/convert/color.json', colorConvertController.convert
@@ -77,9 +77,9 @@ app.get '/v1/authorizations.json', authBasic, authController.list
 app.post '/v1/authorizations.json', authBasic, authController.create
 
 # OAuth2 Authenticated routes
-app.get '/v1/users.json', authBearer, userController.list
-app.put '/v1/users.json', authBearer, userController.update
-app.delete '/v1/users.json', authBearer, userController.delete
+app.get '/v1/users.json', authBearer(), userController.list
+app.put '/v1/users.json', authBearer(), userController.update
+app.delete '/v1/users.json', authBearer(), userController.delete
 
 # Start the server
 exports.start = (listen, done) ->
