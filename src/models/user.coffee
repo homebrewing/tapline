@@ -1,6 +1,10 @@
-bcrypt = require 'bcryptjs'
 mongoose = require 'mongoose'
 util = require '../util'
+
+try
+    bcrypt = require 'bcrypt'
+catch err
+    bcrypt = require 'bcryptjs'
 
 UserSchema = new mongoose.Schema
     # Wether the user's email is confirmed

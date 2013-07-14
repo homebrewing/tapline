@@ -75,6 +75,9 @@
     "passport-http": "~0.2.2",
     "passport": "~0.1.17"
   },
+  "optionalDependencies": {
+    "bcrypt": "~0.7.6"
+  },
   "devDependencies": {
     "coffee-script": ">=1.6 <2",
     "coffeelint": ">=0.5.6 <1",

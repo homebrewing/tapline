@@ -1,7 +1,11 @@
-bcrypt = require 'bcryptjs'
 brauhaus = require 'brauhaus'
 
 require 'brauhaus-beerxml'
+
+try
+    bcrypt = require 'bcrypt'
+catch err
+    bcrypt = require 'bcryptjs'
 
 # Test database URL
 exports.testDb = 'mongodb://localhost/tapline_test'
