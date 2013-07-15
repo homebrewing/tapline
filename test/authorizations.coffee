@@ -7,7 +7,10 @@ util = require '../lib/util'
 
 {app} = require '../lib/server'
 
+Authorization = require '../lib/models/authorization'
+
 authInfo = {}
+newAuthId = null
 
 describe '/v1/authorizations.json', ->
     before (done) ->
@@ -22,7 +25,9 @@ describe '/v1/authorizations.json', ->
                 done()
 
     after (done) ->
-        db.close done
+        Authorization.remove {_id: newAuthId}, (err) ->
+            if err then return done(err)
+            db.close done
 
     describe 'Create a new authorization', ->
         it 'Should return JSON on success', (done) ->
@@ -36,6 +41,9 @@ describe '/v1/authorizations.json', ->
                     if err then return done(err)
 
                     assert.ok res.body
+                    assert.ok res.body.token
+
+                    newAuthId = res.body.id
 
                     done()
 
@@ -58,6 +66,20 @@ describe '/v1/authorizations.json', ->
                 .auth(authInfo.user.name, 'abc123')
                 .send(clientId: authInfo.client.key, clientSecret: 'invalid')
                 .expect 401, done
+
+        it 'Should require client id', (done) ->
+            request(app)
+                .post('/v1/authorizations.json')
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientSecret: authInfo.client.secret)
+                .expect 400, done
+
+        it 'Should require client secret', (done) ->
+            request(app)
+                .post('/v1/authorizations.json')
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key)
+                .expect 400, done
 
     describe 'List authorizations', ->
         it 'Should return JSON on success', (done) ->
@@ -94,3 +116,107 @@ describe '/v1/authorizations.json', ->
                 .query(clientId: authInfo.client.key, clientSecret: 'invalid')
                 .expect 401, done
 
+        it 'Should require client id', (done) ->
+            request(app)
+                .get('/v1/authorizations.json')
+                .auth(authInfo.user.name, 'abc123')
+                .query(clientSecret: authInfo.client.secret)
+                .expect 400, done
+
+        it 'Should require client secret', (done) ->
+            request(app)
+                .get('/v1/authorizations.json')
+                .auth(authInfo.user.name, 'abc123')
+                .query(clientId: authInfo.client.key)
+                .expect 400, done
+
+    describe 'Update authorizations', ->
+        it 'Should return JSON on success', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, scopes: ['test1', 'test2'])
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end (err, res) ->
+                    if err then return done(err)
+
+                    assert.ok res.body
+
+                    done()
+
+        it 'Should return error on missing basic auth', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, scopes: [])
+                .expect 401, done
+
+        it 'Should return error on invalid client id', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: 'invalid', clientSecret: authInfo.client.secret, scopes: [])
+                .expect 401, done
+
+        it 'Should return error on invalid client secret', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: 'invalid', scopes: [])
+                .expect 401, done
+
+        it 'Should require client id', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientSecret: authInfo.client.secret, scopes: [])
+                .expect 400, done
+
+        it 'Should require client secret', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, scopes: [])
+                .expect 400, done
+
+        it 'Should require scopes', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .expect 400, done
+
+        it 'Should set scopes', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, scopes: ['test1'])
+                .expect 200, done
+
+        it 'Should add scopes', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, addScopes: ['test2', 'test3'])
+                .expect(200)
+                .end (err, res) ->
+                    items = ['test1', 'test2', 'test3']
+
+                    for x in [0...items.length]
+                        assert.equal items[x], res.body.scopes[x]
+
+                    done()
+
+        it 'Should remove scopes', (done) ->
+            request(app)
+                .put("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, removeScopes: ['test2', 'test3'])
+                .expect(200)
+                .end (err, res) ->
+                    items = ['test1']
+
+                    for x in [0...items.length]
+                        assert.equal items[x], res.body.scopes[x]
+
+                    done()

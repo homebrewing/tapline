@@ -201,6 +201,8 @@ Authorizations API
 ------------------
 The authorizations API is a bit different from other calls in Tapline, in that it requires HTTP basic auth along with third party client information for every request instead of using OAuth bearer tokens. This means that the authorizations API requires that you temporarily collect a user's name and password until you can get an OAuth2 bearer token.
 
+The authorizations API is heavily inspired by the [Github API](http://developer.github.com/v3/oauth/).
+
 ### Create an Authorization Token
 Create a new authorization for a third party client and a specific user. The response will give you an OAuth bearer token to use for authorized API requests on behalf of that user with the given scopes, if any. The request __must__ use HTTP basic auth (the `Authorization` header below) using the user's `name` and `password`, as well as including the `clientId` and `clientSecret` of the registered third party client.
 
@@ -232,7 +234,96 @@ X-Response-Time: 100ms
     "created": "2013-07-11T17:28:52.787Z",
     "id": "51deeb54763ce70000000001",
     "scopes": [
-        "user",
+        "profile",
+        "recipe"
+    ],
+    "token": "b608d4b097c838067aba07eb9206faab1bf4b446",
+    "userId": "51de54131084ffeef8000001"
+}
+```
+
+#### Errors
+
+| Code | Description                            |
+| ---- | -------------------------------------- |
+| 400  | Invalid request arguments              |
+| 401  | Invalid user/password or client/secret |
+| 500  | Internal server error                  |
+
+### Listing Authorization Tokens
+List a third-party client's authorization tokens for a specific user. The responses will give you a OAuth bearer tokens to use for authorized API requests on behalf of that user with the given scopes, if any. The request __must__ use HTTP basic auth (the `Authorization` header below) using the user's `name` and `password`, as well as including the `clientId` and `clientSecret` of the registered third party client.
+
+#### Request
+```http
+GET /v1/authorizations.json?clientId=abc123&clientSecret=some-secret HTTP/1.1
+Content-Type: application/json
+Authorization: Basic ZGFuaWVsOmFiYzEyMw==
+```
+
+#### Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Request-ID: 64a359b2
+X-Response-Time: 100ms
+
+[
+    {
+        "clientId": "abc123",
+        "created": "2013-07-11T17:28:52.787Z",
+        "id": "51deeb54763ce70000000001",
+        "scopes": [
+            "profile",
+            "recipe"
+        ],
+        "token": "b608d4b097c838067aba07eb9206faab1bf4b446",
+        "userId": "51de54131084ffeef8000001"
+    }
+]
+```
+
+#### Errors
+
+| Code | Description                            |
+| ---- | -------------------------------------- |
+| 400  | Invalid request arguments              |
+| 401  | Invalid user/password or client/secret |
+| 500  | Internal server error                  |
+
+### Update an Authorization Token
+Update an existing authorization by its unique id. The request __must__ use HTTP basic auth (the `Authorization` header below) using the user's `name` and `password`, as well as including the `clientId` and `clientSecret` of the registered third party client.
+
+Scopes can be set to a new list via `scopes`, appended to via `addScopes` or removed from via `removeScopes`. One of these three is required. Passing more than one will result in an error.
+
+#### Request
+```http
+PUT /v1/authorizations/51deeb54763ce70000000001.json HTTP/1.1
+Content-Type: application/json
+Authorization: Basic ZGFuaWVsOmFiYzEyMw==
+
+{
+    "clientId": "abc123",
+    "clientSecret": "some-secret",
+    "addScopes": [
+        "profile:delete"
+    ]
+}
+```
+
+#### Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Request-ID: 64a359b2
+X-Response-Time: 100ms
+
+{
+    "clientId": "abc123",
+    "created": "2013-07-11T17:28:52.787Z",
+    "id": "51deeb54763ce70000000001",
+    "scopes": [
+        "profile",
+        "profile:delete",
         "recipe"
     ],
     "token": "b608d4b097c838067aba07eb9206faab1bf4b446",

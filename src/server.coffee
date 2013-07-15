@@ -73,8 +73,9 @@ app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
 app.post '/v1/users.json', userController.create
 
 # Basic authenticated routes
-app.get '/v1/authorizations.json', authBasic, authController.list
 app.post '/v1/authorizations.json', authBasic, authController.create
+app.get '/v1/authorizations.json', authBasic, authController.list
+app.put '/v1/authorizations/:id.json', authBasic, authController.update
 
 # OAuth2 Authenticated routes
 app.get '/v1/users.json', authBearer(), userController.list
