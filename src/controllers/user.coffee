@@ -21,6 +21,7 @@ listSchema = jsonGate.createSchema
         sort:
             type: 'string'
             enum: ['name', '-name', 'created', '-created', 'recipeCount', '-recipeCount']
+            default: 'name'
 
 # User creation request schema
 creationSchema = jsonGate.createSchema

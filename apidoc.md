@@ -349,8 +349,6 @@ This method __does not require authentication or authorization__. A new user can
 
 The user `name` should be made up of lowercase letters, numbers, `-` and `_` so that it is safe to be used in URLs.
 
-When a user account is created 
-
 ### Request
 ```http
 POST /v1/users.json HTTP/1.1
@@ -371,10 +369,10 @@ X-Request-ID: 60b03d63
 X-Response-Time: 240ms
 
 {
-    "confirmed": false, 
-    "created": "2013-07-09T04:19:13.213Z", 
-    "id": "51db8f41dd6939ffb9000001", 
-    "name": "my_cool_username", 
+    "confirmed": false,
+    "created": "2013-07-09T04:19:13.213Z",
+    "id": "51db8f41dd6939ffb9000001",
+    "name": "my_cool_username",
     "recipeCount": 0
 }
 ```
@@ -385,6 +383,43 @@ X-Response-Time: 240ms
 | ---- | --------------------------------------------- |
 | 400  | Invalid request arguments, duplicate username |
 | 500  | Internal server error                         |
+
+Listing Users
+-------------
+Get a list of users. Two parameters are used for pagination: `offset` which defines the number of results skip and `limit` which defines how many results to return up to 60. The defaults are `0` and `20`. Sorting is accomplished via the `sort` parameter which can be one of `name`, `-name`, `created`, `-created`, `recipeCount`, `-recipeCount`. The default sort is `name`.
+
+### Request
+```http
+GET /v1/users.json?offset=10&limit=10&sort=-recipeCount HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer b608d4b097c838067aba07eb9206faab1bf4b446
+```
+
+### Response
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Request-ID: 60b03d63
+X-Response-Time: 40ms
+
+[
+    {
+        "confirmed": false,
+        "created": "2013-07-09T04:19:13.213Z",
+        "id": "51db8f41dd6939ffb9000001",
+        "name": "my_cool_username",
+        "recipeCount": 0
+    }
+]
+```
+
+### Errors
+
+| Code | Description                 |
+| ---- | --------------------------- |
+| 400  | Invalid request arguments   |
+| 401  | Invalid OAuth2 bearer token |
+| 500  | Internal server error       |
 
 Recipes
 =======
