@@ -220,3 +220,45 @@ describe '/v1/authorizations.json', ->
                         assert.equal items[x], res.body.scopes[x]
 
                     done()
+
+    describe 'Delete an authorization', ->
+        it 'Should return error on missing basic auth', (done) ->
+            request(app)
+                .del("/v1/authorizations/#{newAuthId}.json")
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .expect 401, done
+
+        it 'Should return error on invalid client id', (done) ->
+            request(app)
+                .del("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: 'invalid', clientSecret: authInfo.client.secret)
+                .expect 401, done
+
+        it 'Should return error on invalid client secret', (done) ->
+            request(app)
+                .del("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: 'invalid')
+                .expect 401, done
+
+        it 'Should require client id', (done) ->
+            request(app)
+                .del("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientSecret: authInfo.client.secret)
+                .expect 400, done
+
+        it 'Should require client secret', (done) ->
+            request(app)
+                .del("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key)
+                .expect 400, done
+
+        it 'Should return JSON on success', (done) ->
+            request(app)
+                .del("/v1/authorizations/#{newAuthId}.json")
+                .auth(authInfo.user.name, 'abc123')
+                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .expect 204, done

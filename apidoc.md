@@ -339,6 +339,39 @@ X-Response-Time: 100ms
 | 401  | Invalid user/password or client/secret |
 | 500  | Internal server error                  |
 
+### Delete an Authorization Token
+Delete an existing authorization by its unique id. The request __must__ use HTTP basic auth (the `Authorization` header below) using the user's `name` and `password`, as well as including the `clientId` and `clientSecret` of the registered third party client.
+
+#### Request
+```http
+DELETE /v1/authorizations/51deeb54763ce70000000001.json HTTP/1.1
+Content-Type: application/json
+Authorization: Basic ZGFuaWVsOmFiYzEyMw==
+
+{
+    "clientId": "abc123",
+    "clientSecret": "some-secret"
+}
+```
+
+#### Response
+```http
+HTTP/1.1 204 No Content
+Content-Type: application/json
+X-Request-ID: 64a359b2
+X-Response-Time: 100ms
+
+
+```
+
+#### Errors
+
+| Code | Description                            |
+| ---- | -------------------------------------- |
+| 400  | Invalid request arguments              |
+| 401  | Invalid user/password or client/secret |
+| 500  | Internal server error                  |
+
 User Accounts
 =============
 User accounts are the owners of data within Tapline. Users own recipes, brew days, follow other users, etc.

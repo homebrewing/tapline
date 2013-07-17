@@ -52,6 +52,16 @@ updateSchema = jsonGate.createSchema
             items:
                 type: 'string'
 
+deleteSchema = jsonGate.createSchema
+    type: 'object'
+    properties:
+        clientId:
+            type: 'string'
+            required: true
+        clientSecret:
+            type: 'string'
+            required: true
+
 # Get the client, making sure it exists and the secrets match up
 getClient = (key, secret, done) ->
     Client.findOne {key}, (err, client) ->
@@ -119,3 +129,15 @@ authController.update = (req, res) ->
                 if err then return res.send(500, err.toString())
 
                 res.json auth
+
+authController.delete = (req, res) ->
+    deleteSchema.validate req.body, (err, data) ->
+        if err then return res.send(400, err.toString())
+
+        getClient data.clientId, data.clientSecret, (err, client) ->
+            if err then return res.send(client, err.toString())
+
+            Authorization.findByIdAndRemove req.params.id, (err) ->
+                if err then return res.send(500, err.toString())
+
+                res.send 204, null

@@ -76,6 +76,7 @@ app.post '/v1/users.json', userController.create
 app.post '/v1/authorizations.json', authBasic, authController.create
 app.get '/v1/authorizations.json', authBasic, authController.list
 app.put '/v1/authorizations/:id.json', authBasic, authController.update
+app.delete '/v1/authorizations/:id.json', authBasic, authController.delete
 
 # OAuth2 Authenticated routes
 app.get '/v1/users.json', authBearer(), userController.list
