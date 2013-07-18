@@ -7,8 +7,23 @@ try
 catch err
     bcrypt = require 'bcryptjs'
 
+# ===============
+# Database Errors
+# ===============
+
+# Duplicate unique key
+exports.ERROR_DB_DUPE = 11000
+
+# ===================
+# Test configurations
+# ===================
+
 # Test database URL
 exports.testDb = 'mongodb://localhost/tapline_test'
+
+# ===============
+# Utility methods
+# ===============
 
 # Extend an object with the values of other objects
 exports.extend = (objects...) ->

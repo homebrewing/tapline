@@ -85,13 +85,19 @@ userController.create = (req, res) ->
         u.setPassword data.password, (err) ->
             if err then return res.send(500, err.toString())
             u.save (err, saved) ->
+                if err and err.code is util.ERROR_DB_DUPE
+                    return res.send 400, "User name #{data.name} already taken!"
                 if err then return res.send(500, err.toString())
 
                 res.json 201, saved
 
 userController.update = (req, res) ->
-    updateSchema.validate req.body, (err, data) ->
+    params = util.extend {}, req.params, req.body
+    updateSchema.validate params, (err, data) ->
         if err then return res.send(400, err.toString())
+
+        if req.user.id isnt data.id
+            return res.send 401, "Token does not match user ID"
 
         # Update the user with a find-and-update. This is called
         # below based on whether a password needs to be updated.
@@ -104,7 +110,11 @@ userController.update = (req, res) ->
             if passwordHash then update.passwordHash = passwordHash
 
             User.findByIdAndUpdate data.id, update, (err, saved) ->
+                if err and err.code is util.ERROR_DB_DUPE
+                    return res.send 400, "User name #{data.name} already taken!"
                 if err then return res.send(500, err.toString())
+                if not saved then return res.send(404, "User not found")
+
                 res.json saved
 
         if data.password
@@ -114,11 +124,14 @@ userController.update = (req, res) ->
             updateFunc()
 
 userController.delete = (req, res) ->
-    deleteSchema.validate req.body, (err, data) ->
+    params = util.extend {}, req.params
+    deleteSchema.validate params, (err, data) ->
         if err then return res.send(400, err.toString())
 
-        User.remove _id: data.id, (err) ->
+        if req.user.id isnt data.id
+            return res.send 401, "Token does not match user ID"
+
+        User.findByIdAndRemove data.id, (err) ->
             if err then return res.send(500, err.toString())
 
-            res.json
-                status: 'success'
+            res.send 204, null

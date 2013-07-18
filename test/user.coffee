@@ -9,6 +9,7 @@ util = require '../lib/util'
 User = require '../lib/models/user'
 
 authInfo = {}
+userId = null
 
 describe '/v1/users.json', ->
     before (done) ->
@@ -37,6 +38,7 @@ describe '/v1/users.json', ->
                 .end (err, res) ->
                     if err then return done(err)
 
+                    userId = res.body.id
                     assert.equal 'test_user', res.body.name
 
                     done()
@@ -57,32 +59,22 @@ describe '/v1/users.json', ->
 
     describe 'Update user', ->
         it 'Should return JSON on success', (done) ->
-            User.findOne (err, user) ->
-                request(app)
-                    .put('/v1/users.json')
-                    .set('Authorization', "Bearer #{authInfo.auth.token}")
-                    .send(id: user.id, name: 'test_user_updated')
-                    .expect('Content-Type', /json/)
-                    .expect(200)
-                    .end (err, res) ->
-                        if err then return done(err)
+            request(app)
+                .put("/v1/users/#{authInfo.user.id}.json")
+                .set('Authorization', "Bearer #{authInfo.auth.token}")
+                .send(name: 'test_user_updated')
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end (err, res) ->
+                    if err then return done(err)
 
-                        assert.equal 'test_user_updated', res.body.name
+                    assert.equal 'test_user_updated', res.body.name
 
-                        done()
+                    done()
 
     describe 'Delete user', ->
         it 'Should return JSON on success', (done) ->
-            User.findOne (err, user) ->
-                request(app)
-                    .del('/v1/users.json')
-                    .set('Authorization', "Bearer #{authInfo.auth.token}")
-                    .send(id: user.id)
-                    .expect('Content-Type', /json/)
-                    .expect(200)
-                    .end (err, res) ->
-                        if err then return done(err)
-
-                        assert.ok res.body.status
-
-                        done()
+            request(app)
+                .del("/v1/users/#{authInfo.user.id}.json")
+                .set('Authorization', "Bearer #{authInfo.auth.token}")
+                .expect 204, done
