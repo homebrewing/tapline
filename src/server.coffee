@@ -86,7 +86,7 @@ app.delete '/v1/users/:id.json', authBearer(), userController.delete
 # Start the server
 exports.start = (listen, done) ->
     [host, port] = listen.split ':'
-    port ?= 8080
+    port ?= 2337
     app.listen port, host
     log.info "Tapline server started on http://#{host}:#{port}"
 

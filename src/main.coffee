@@ -5,7 +5,7 @@ optimist = require('optimist')
     .options 'l',
         alias: 'listen'
         describe: 'Listen on host:port'
-        default: 'localhost:8080'
+        default: 'localhost:2337'
     .options 's',
         alias: 'dbUrl'
         describe: 'MongoDB connection URL'

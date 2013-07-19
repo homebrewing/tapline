@@ -22,6 +22,8 @@ Planned features include:
 
 Tapline was developed with and for [Malt.io](http://www.malt.io/), a community website for homebrewers to create recipes and share their love of homebrewing beer.
 
+The Tapline name was chosen because like a central tap line, this project provides a connection between storage (kegs) and serving requests (taps to fill beers).
+
 Documentation
 -------------
 The Tapline API documentation is in a separate document to keep the reference as slim as possible. For now it is stored in a static file, but in the future may include a way to do example calls.
@@ -52,6 +54,8 @@ Tapline installs a new command, called `tapline`, that will let you run the serv
 ```bash
 tapline
 ```
+
+By default, Tapline will run on http://localhost:2337/ (the port spells 'beer' on a typical phone)
 
 Contributing
 ------------
