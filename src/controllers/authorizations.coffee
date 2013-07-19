@@ -118,6 +118,10 @@ authController.update = (req, res) ->
         getClient data.clientId, data.clientSecret, (err, client) ->
             if err then return res.send(client, err)
 
+            query =
+                _id: req.params.id
+                userId: req.user.id
+
             update = {}
 
             if data.scopes then update.$set = {scopes: data.scopes}
@@ -125,8 +129,9 @@ authController.update = (req, res) ->
             if data.removeScopes then update.$pullAll = {scopes: data.removeScopes}
 
             # Find and update an entry
-            Authorization.findByIdAndUpdate req.params.id, update, (err, auth) ->
+            Authorization.findOneAndUpdate query, update, (err, auth) ->
                 if err then return res.send(500, err.toString())
+                if not auth then return res.send(404, 'Authorization not found')
 
                 res.json auth
 
@@ -137,7 +142,12 @@ authController.delete = (req, res) ->
         getClient data.clientId, data.clientSecret, (err, client) ->
             if err then return res.send(client, err.toString())
 
-            Authorization.findByIdAndRemove req.params.id, (err) ->
+            query =
+                _id: req.params.id
+                userId: req.user.id
+
+            Authorization.findOneAndRemove query, (err, auth) ->
                 if err then return res.send(500, err.toString())
+                if not auth then return res.send(404, 'Authorization not found')
 
                 res.send 204, null
