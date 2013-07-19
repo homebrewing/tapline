@@ -8,9 +8,11 @@ AuthorizationSchema = new mongoose.Schema
         default: ->
             crypto.randomBytes(20).toString 'hex'
     userId:
-        type: String
+        type: mongoose.Schema.Types.ObjectId
+        required: true
     clientId:
-        type: String
+        type: mongoose.Schema.Types.ObjectId
+        required: true
     scopes:
         type: [String]
     created:

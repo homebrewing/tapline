@@ -80,7 +80,7 @@ authController.create = (req, res) ->
 
             auth = new Authorization
                 userId: req.user.id
-                clientId: data.clientId
+                clientId: client.id
                 scopes: data.scopes
 
             auth.save (err, auth) ->
@@ -96,7 +96,7 @@ authController.list = (req, res) ->
             if err then return res.send(client, err)
 
             params =
-                clientId: data.clientId
+                clientId: client.id
                 userId: req.user.id
 
             Authorization.find params, (err, auths) ->

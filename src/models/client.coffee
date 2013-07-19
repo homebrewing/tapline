@@ -2,6 +2,9 @@ crypto = require 'crypto'
 mongoose = require 'mongoose'
 
 ClientSchema = new mongoose.Schema
+    userId:
+        type: mongoose.Schema.Types.ObjectId
+        required: true
     name:
         type: String
     key:

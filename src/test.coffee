@@ -24,18 +24,30 @@ ensureUser = (done) ->
                 done(null, user)
 
 # Create a new API client
-ensureClient = (done) ->
+ensureClient = (user, done) ->
     Client.findOne {name: 'Auth Test'}, (err, client) ->
         if err then return done(err)
-        if client then return done(null, client)
+        if client
+            if client.userId isnt user.id
+                # Values may change between runs, so make sure they
+                # are set properly after load. This could happen if
+                # the user is accidentally deleted and recreated,
+                # for example.
+                client.userId = user.id
+                client.save (err, client) ->
+                    if err then return done(err)
+                    return done(null, client)
+            else
+                return done(null, client)
+        else
+            # Create the client if not found
+            client = new Client
+                userId: user.id
+                name: 'Auth Test'
 
-        # Create the client if not found
-        client = new Client
-            name: 'Auth Test'
-
-        client.save (err, client) ->
-            if err then return done(err)
-            done(null, client)
+            client.save (err, client) ->
+                if err then return done(err)
+                done(null, client)
 
 # Create the test authorization
 ensureAuth = (user, client, done) ->
@@ -55,9 +67,9 @@ ensureAuth = (user, client, done) ->
                 
                 auth.save (err, auth) ->
                     if err then return done(err)
-                    done(null, auth)
+                    return done(null, auth)
             else
-                done(null, auth)
+                return done(null, auth)
         else
             # Create the authorization if not found
             auth = new Authorization
@@ -76,7 +88,7 @@ ensureAuth = (user, client, done) ->
 exports.setupAuth = (done) ->
     ensureUser (err, user) ->
         if err then return done(err)
-        ensureClient (err, client) ->
+        ensureClient user, (err, client) ->
             if err then return done(err)
             ensureAuth user, client, (err, auth) ->
                 if err then return done(err)
