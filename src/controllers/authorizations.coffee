@@ -26,6 +26,7 @@ createSchema = jsonGate.createSchema
             required: true
         scopes:
             type: 'array'
+            maxItems: 50
             items:
                 type: 'string'
             default: []
@@ -41,14 +42,17 @@ updateSchema = jsonGate.createSchema
             required: true
         scopes:
             type: 'array'
+            maxItems: 50
             items:
                 type: 'string'
         addScopes:
             type: 'array'
+            maxItems: 50
             items:
                 type: 'string'
         removeScopes:
             type: 'array'
+            maxItems: 50
             items:
                 type: 'string'
 
@@ -125,7 +129,7 @@ authController.update = (req, res) ->
             update = {}
 
             if data.scopes then update.$set = {scopes: data.scopes}
-            if data.addScopes then update.$addToSet = {scopes: {$each: data.addScopes}}
+            if data.addScopes then update.$addToSet = {scopes: {$each: data.addScopes, $slice: 50}}
             if data.removeScopes then update.$pullAll = {scopes: data.removeScopes}
 
             # Find and update an entry

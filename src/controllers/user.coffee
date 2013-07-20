@@ -159,7 +159,7 @@ userController.update = (req, res) ->
             if passwordHash then update.passwordHash = passwordHash
 
             if data.following then update.following = data.scopes
-            if data.addFollowing then update.$addToSet = {following: {$each: data.addFollowing}}
+            if data.addFollowing then update.$addToSet = {following: {$each: data.addFollowing, $slice: 100}}
             if data.removeFollowing then update.$pullAll = {following: data.removeFollowing}
 
             User.findByIdAndUpdate data.id, update, (err, saved) ->
