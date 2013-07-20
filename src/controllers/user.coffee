@@ -45,6 +45,11 @@ creationSchema = jsonGate.createSchema
         password:
             type: 'string'
             required: true
+        following:
+            type: 'array'
+            maxItems: 100
+            items:
+                type: 'string'
 
 # User update request schema
 updateSchema = jsonGate.createSchema
@@ -61,6 +66,21 @@ updateSchema = jsonGate.createSchema
             pattern: USERNAME_RE
         password:
             type: 'string'
+        following:
+            type: 'array'
+            maxItems: 100
+            items:
+                type: 'string'
+        addFollowing:
+            type: 'array'
+            maxItems: 100
+            items:
+                type: 'string'
+        removeFollowing:
+            type: 'array'
+            maxItems: 100
+            items:
+                type: 'string'
 
 # User deletion request schema
 deleteSchema = jsonGate.createSchema
@@ -96,6 +116,7 @@ userController.create = (req, res) ->
         u = new User
             name: data.name
             email: data.email
+            following: data.following
 
         u.setPassword data.password, (err) ->
             if err then return res.send(500, err.toString())
@@ -122,6 +143,11 @@ userController.update = (req, res) ->
         if req.user.id isnt data.id
             return res.send 401, "Token does not match user ID"
 
+        count = [data.following, data.addFollowing, data.removeFollowing].filter((x) -> x).length
+
+        if count > 1
+            return res.send(400, 'Only one of following, addFollowing or removeFollowing can be given')
+
         # Update the user with a find-and-update. This is called
         # below based on whether a password needs to be updated.
         updateFunc = (passwordHash) ->
@@ -132,11 +158,17 @@ userController.update = (req, res) ->
 
             if passwordHash then update.passwordHash = passwordHash
 
+            if data.following then update.following = data.scopes
+            if data.addFollowing then update.$addToSet = {following: {$each: data.addFollowing}}
+            if data.removeFollowing then update.$pullAll = {following: data.removeFollowing}
+
             User.findByIdAndUpdate data.id, update, (err, saved) ->
                 if err and err.code is util.ERROR_DB_DUPE
                     return res.send 400, "User name #{data.name} already taken!"
                 if err then return res.send(500, err.toString())
                 if not saved then return res.send(404, "User not found")
+
+                # TODO: Create user-followed actions
 
                 res.json saved
 

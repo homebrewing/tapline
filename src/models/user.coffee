@@ -30,6 +30,12 @@ UserSchema = new mongoose.Schema
     created:
         type: Date
         default: Date.now
+    # List of user IDs being followed
+    following:
+        type: Array
+        maxItems: 100
+        items:
+            type: mongoose.Schema.Types.ObjectId
     # Cached number of recipes owned
     recipeCount:
         type: Number
