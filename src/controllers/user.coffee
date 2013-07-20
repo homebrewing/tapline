@@ -70,6 +70,9 @@ deleteSchema = jsonGate.createSchema
             required: true
 
 userController.list = (req, res) ->
+    if req.params.id
+        req.query.ids = req.params.id
+
     util.queryConvert req.query, {ids: Array, offset: Number, limit: Number}, (err) ->
         if err then return res.send(400, err.toString())
 
