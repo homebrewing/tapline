@@ -11,6 +11,12 @@ USERNAME_RE = '^[a-z0-9_-]{4,30}$'
 listSchema = jsonGate.createSchema
     type: 'object'
     properties:
+        ids:
+            type: 'array'
+            minItems: 1
+            maxItems: 60
+            items:
+                type: 'string'
         offset:
             type: 'number'
             default: 0
@@ -64,15 +70,21 @@ deleteSchema = jsonGate.createSchema
             required: true
 
 userController.list = (req, res) ->
-    util.toInt req.query, ['offset', 'limit'], (err) ->
+    util.queryConvert req.query, {ids: Array, offset: Number, limit: Number}, (err) ->
         if err then return res.send(400, err.toString())
 
         listSchema.validate req.query, (err, data) ->
             if err then return res.send(400, err.toString())
 
-            User.find().skip(data.offset).limit(data.limit).sort(data.sort).exec (err, users) ->
-                res.json
-                    users: users
+            query = {}
+
+            if data.ids
+                query._id =
+                    $in: data.ids
+
+            User.find(query).sort(data.sort).skip(data.offset).limit(data.limit).exec (err, users) ->
+                if err then return res.send(500, err.toString())
+                res.json users
 
 userController.create = (req, res) ->
     creationSchema.validate req.body, (err, data) ->

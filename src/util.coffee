@@ -53,19 +53,23 @@ exports.getRecipeList = (format, list) ->
                 temp = temp.concat brauhaus.Recipe.fromBeerXml(xml)
             temp
 
-# Convert a list of parameters on an object to integers, useful for
+# Convert a list of parameters on a query object, useful for
 # pre-processing `req.query` which sends everything as a string before
 # validating with JSON Schema. Calls `done` when finished or when
 # the first error is encountered.
-exports.toInt = (obj, params, done) ->
-    for param in params
-        if obj[param] is undefined
-            continue
+exports.queryConvert = (obj, paramMap, done) ->
+    for own param, type of paramMap
+        if obj[param] is undefined then continue
 
-        if isNaN(obj[param])
-            return done("#{param} value '#{obj[param]}' could not be converted to an integer!")
+        switch type
+            when Number
+                if isNaN(obj[param])
+                    return done("#{param} value '#{obj[param]}' could
+                                 not be converted to an integer!")
 
-        obj[param] = parseInt obj[param]
+                obj[param] = parseInt obj[param]
+            when Array
+                obj[param] = obj[param].split ','
 
     done()
 

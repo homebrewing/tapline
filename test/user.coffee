@@ -53,7 +53,7 @@ describe '/v1/users.json', ->
                 .end (err, res) ->
                     if err then return done(err)
 
-                    assert.ok res.body.users
+                    assert.ok res.body
 
                     done()
 
