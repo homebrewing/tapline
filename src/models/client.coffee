@@ -7,6 +7,10 @@ ClientSchema = new mongoose.Schema
         required: true
     name:
         type: String
+    description:
+        type: String
+    imageUrl:
+        type: String
     key:
         type: String
         unique: true
