@@ -80,8 +80,8 @@ app.delete '/v1/authorizations/:id.json', authBasic, authController.delete
 
 # OAuth2 Authenticated routes
 app.get '/v1/users.json', authBearer(), userController.list
-app.put '/v1/users/:id.json', authBearer(), userController.update
-app.delete '/v1/users/:id.json', authBearer(), userController.delete
+app.put '/v1/users/:id.json', authBearer('user'), userController.update
+app.delete '/v1/users/:id.json', authBearer('user:delete'), userController.delete
 
 # Start the server
 exports.start = (listen, done) ->
