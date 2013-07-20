@@ -1,6 +1,7 @@
 jsonGate = require 'json-gate'
 util = require '../util'
 
+Action = require '../models/action'
 User = require '../models/user'
 
 userController = exports
@@ -81,9 +82,8 @@ userController.list = (req, res) ->
 
             query = {}
 
-            if data.ids
-                query._id =
-                    $in: data.ids
+            if data.ids then query._id =
+                $in: data.ids
 
             User.find(query).sort(data.sort).skip(data.offset).limit(data.limit).exec (err, users) ->
                 if err then return res.send(500, err.toString())
@@ -103,6 +103,14 @@ userController.create = (req, res) ->
                 if err and err.code is util.ERROR_DB_DUPE
                     return res.send 400, "User name #{data.name} already taken!"
                 if err then return res.send(500, err.toString())
+
+                action = new Action
+                    userId: saved.id
+                    type: 'user-joined'
+                    data:
+                        name: saved.name
+
+                action.save()
 
                 res.json 201, saved
 

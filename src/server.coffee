@@ -17,6 +17,7 @@ recipeCalculateController = require './controllers/calculate/recipe'
 
 authController = require './controllers/authorizations'
 userController = require './controllers/user'
+actionController = require './controllers/actions'
 
 # =================
 # Setup HTTP server
@@ -82,6 +83,8 @@ app.delete '/v1/authorizations/:id.json', authBasic, authController.delete
 app.get '/v1/users/:id?.json', authBearer(), userController.list
 app.put '/v1/users/:id.json', authBearer('user'), userController.update
 app.delete '/v1/users/:id.json', authBearer('user:delete'), userController.delete
+
+app.get '/v1/actions/:id?.json', authBearer(), actionController.list
 
 # Start the server
 exports.start = (listen, done) ->
