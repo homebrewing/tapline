@@ -25,5 +25,8 @@ ClientSchema = new mongoose.Schema
     created:
         type: Date
         default: Date.now
+    trusted:
+        type: Boolean
+        default: false
 
 module.exports = mongoose.model 'Client', ClientSchema
