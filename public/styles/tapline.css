@@ -1,0 +1,57 @@
+.btn-social {
+    position: relative;
+    padding-left: 32px;
+}
+
+.btn-social i {
+    position: absolute;
+    font-size: 150%;
+    left: 6px;
+}
+
+.btn-facebook {
+    background-color: #3b5998;
+    background-image: linear-gradient(to bottom, #627aab, #3b5998);
+}
+
+.btn-facebook:hover {
+    background-color: #3b5998;
+}
+
+.permission {
+    color: #555;
+    background-color: rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 4px 0px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+}
+
+.permission-read, .permission-write, .permission-delete {
+    color: white;
+    opacity: 1;
+}
+
+.permission-read {
+    background-color: #60b044;
+}
+
+.permission-write {
+    background-color: orange;
+}
+
+.permission-delete {
+    background-color: red;
+}
+
+.permission-desc {
+    padding-top: 5px;
+}
+
+.footer {
+    color: rgba(0, 0, 0, 0.3);
+    text-align: center;
+    margin: 1em;
+}
