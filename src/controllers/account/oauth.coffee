@@ -1,3 +1,4 @@
+_ = require 'lodash'
 Authorization = require '../../models/authorization'
 Client = require '../../models/client'
 Grant = require '../../models/grant'
@@ -108,15 +109,32 @@ oauthController.postAccessToken = (req, res) ->
             if not grant.clientId.equals(client.id)
                 return res.send(401, 'Grant does not match client ID')
 
-            # Create the oauth token!
-            token = new Authorization
-                userId: grant.userId
-                clientId: client.id
-                scopes: grant.scopes
-
-            token.save (err, token) ->
+            Authorization.findOne userId: grant.userId, clientId: grant.clientId, (err, auth) ->
                 if err then return res.send(500, err.toString())
+                if not auth
+                    # Create the oauth token!
+                    auth = new Authorization
+                        userId: grant.userId
+                        clientId: client.id
+                        scopes: grant.scopes
 
-                res.json
-                    access_token: token.code
-                    token_type: 'bearer'
+                    auth.save (err, auth) ->
+                        if err then return res.send(500, err.toString())
+
+                        res.json
+                            access_token: auth.code
+                            token_type: 'bearer'
+                else
+                    if _.isEqual(grant.scopes, auth.scopes)
+                        res.json
+                            access_token: auth.code
+                            token_type: 'bearer'
+                    else
+                        auth.scopes = grant.scopes
+
+                        auth.save (err, auth) ->
+                            if err then return res.send(500, err.toString())
+
+                            res.json
+                                access_token: auth.code
+                                token_type: 'bearer'

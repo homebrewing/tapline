@@ -11,6 +11,8 @@ User = require '../lib/models/user'
 
 authInfo = {}
 cookie = null
+grant = null
+token = null
 
 describe '/account', ->
     before (done) ->
@@ -27,7 +29,7 @@ describe '/account', ->
     after (done) ->
         db.close done
 
-    describe 'Login / logout', ->
+    describe 'Login', ->
         it 'Should return HTML on success', (done) ->
             request(app)
                 .get('/account/login')
@@ -46,6 +48,58 @@ describe '/account', ->
 
                     done()
 
+    describe 'OAuth web flow', ->
+        it 'Should render a grant request page', (done) ->
+            request(app)
+                .get('/account/authorize')
+                .query(client_id: authInfo.client.id, scope: 'user,recipe', state: 'test')
+                .set('Cookie', cookie)
+                .expect('Content-Type', /html/)
+                .expect 200, done
+
+        it 'Should return a grant code and state to redirectUri', (done) ->
+            request(app)
+                .post('/account/authorize')
+                .send(clientId: authInfo.client.id, scopes: 'user,recipe', state: 'test', redirectUri: 'foo')
+                .set('Cookie', cookie)
+                .expect(302)
+                .expect('Location', /foo/)
+                .expect('Location', /code/)
+                .expect('Location', /state/)
+                .end (err, res) ->
+                    if err then return done(err)
+
+                    grant = /code=([^&]+)/.exec(res.headers.location)[1]
+
+                    if not grant then return done('Grant could not be extracted')
+
+                    done()
+
+        it 'Should return an access token from a grant code', (done) ->
+            request(app)
+                .post('/account/access_token')
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, code: grant)
+                .expect(200)
+                .end (err, res) ->
+                    if err then return done(err)
+
+                    token = res.body.token
+
+                    done()
+
+        it 'Should return the same access token on subsequent requests', (done) ->
+            request(app)
+                .post('/account/access_token')
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, code: grant)
+                .expect(200)
+                .end (err, res) ->
+                    if err then return done(err)
+
+                    assert.equal token, res.body.token
+
+                    done()
+
+    describe 'Logout', ->
         it 'Should lot a user out', (done) ->
             request(app)
                 .get('/account/logout')
