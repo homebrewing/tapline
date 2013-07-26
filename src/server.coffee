@@ -1,10 +1,13 @@
+ensureLogin = require './middleware/ensure-login'
 express = require 'express'
 log = require './log'
 passport = require 'passport'
+path = require 'path'
 
 # Authentication strategies
 {BasicStrategy} = require 'passport-http'
 BearerStrategy = require('passport-http-bearer').Strategy
+LocalStrategy = require('passport-local').Strategy
 
 Authorization = require './models/authorization'
 User = require './models/user'
@@ -19,24 +22,37 @@ authController = require './controllers/authorizations'
 userController = require './controllers/user'
 actionController = require './controllers/actions'
 
+loginController = require './controllers/account/login'
+accountController = require './controllers/account/account'
+oauthController = require './controllers/account/oauth'
+
 # =================
 # Setup HTTP server
 # =================
 app = exports.app = express()
 app.configure ->
     app.disable 'x-powered-by'
+    app.set 'views', path.normalize(path.join("#{__dirname}", '..', 'views'))
+    app.set 'view engine', 'jade'
     app.use express.responseTime()
     app.use express.bodyParser()
     app.use express.methodOverride()
     app.use require('./middleware/requestId')
     app.use require('./middleware/log')
+    # Web browser specific route middleware
+    app.use '/account', express.cookieParser()
+    app.use '/account', express.session(secret: 'l3jh4532khg52')
     app.use passport.initialize()
-    #app.use passport.session()
+    app.use '/account', passport.session()
+    app.use '/account', require('./middleware/user')
     app.use app.router
+    app.use express.static(path.normalize(path.join("#{__dirname}", '..', 'public')))
 
 # =====================
 # Setup Auth Strategies
 # =====================
+
+# HTTP Basic
 passport.use new BasicStrategy (username, password, done) ->
     User.findOne {name: username}, (err, user) ->
         if err then return done(err)
@@ -48,6 +64,7 @@ passport.use new BasicStrategy (username, password, done) ->
 
             done(null, user)
 
+# OAuth2 Bearer Token
 passport.use new BearerStrategy (token, done) ->
     Authorization.findOne {token}, (err, auth) ->
         if err then return done(err)
@@ -58,6 +75,26 @@ passport.use new BearerStrategy (token, done) ->
             if not user then return done(null, false)
 
             done(null, user, {scopes: auth.scopes})
+
+# Local data store user/pass
+passport.use new LocalStrategy (username, password, done) ->
+    User.findOne name: username, (err, user) ->
+        if err then return done(err)
+        if not user then return done(null, false, {message: 'Incorrect username'})
+
+        user.authenticate password, (err, success) ->
+            if err then return done(err)
+            if not success then return done(null, false, {message: 'Incorrect password'})
+
+            done(null, user)
+
+# User serialization for auth
+passport.serializeUser (user, done) ->
+    done null, user.id
+
+passport.deserializeUser (id, done) ->
+    User.findOne _id: id, (err, user) ->
+        done err, user
 
 # =============
 # Define routes
@@ -73,6 +110,8 @@ app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
 
 app.post '/v1/users.json', userController.create
 
+app.post '/account/access_token', oauthController.postAccessToken
+
 # Basic authenticated routes
 app.post '/v1/authorizations.json', authBasic, authController.create
 app.get '/v1/authorizations.json', authBasic, authController.list
@@ -85,6 +124,17 @@ app.put '/v1/users/:id.json', authBearer('user'), userController.update
 app.delete '/v1/users/:id.json', authBearer('user:delete'), userController.delete
 
 app.get '/v1/actions/:id?.json', authBearer(), actionController.list
+
+# HTML routes
+app.get '/account/login', loginController.loginPage
+app.post '/account/login', loginController.login
+app.get '/account/logout', ensureLogin, loginController.logout
+
+app.get '/account', ensureLogin, accountController.accountPage
+app.post '/account', ensureLogin, accountController.updateAccount
+
+app.get '/account/authorize', ensureLogin, oauthController.getAuthorization
+app.post '/account/authorize', ensureLogin, oauthController.postAuthorization
 
 # Start the server
 exports.start = (listen, done) ->
