@@ -1,0 +1,43 @@
+extends layout
+
+block content
+    ul.breadcrumb
+        li
+            a(href="http://www.malt.io/") home
+            span.divider /
+        li sign in
+    .row
+        .span6
+            h2 Sign In or Register
+            p Please sign in to your <strong>Malt<span style="opacity: 0.6">.io</span></strong> account below.
+            a.btn.btn-danger.btn-social <i class="icon-google-plus-sign"></i> Sign in with Google
+            span(style="margin: 0 12px; opacity: 0.4") - or -
+            a.btn.btn-primary.btn-social.btn-facebook <i class="icon-facebook-sign"></i> Sign in with Facebook
+            hr
+            form(method="post")
+                input(type="hidden", name="next", value="#{next}")
+                fieldset
+                    div
+                        .input-prepend
+                            span.add-on: i.icon-user
+                            input(type="text", name="username", placeholder="username", autofocus)
+                    div
+                        .input-prepend
+                            span.add-on: i.icon-lock
+                            input(type="password", name="password", placeholder="password")
+                        span.help-block <small>Forgot your password?</small>
+                    a.btn Register
+                    span &nbsp;&nbsp;
+                    button.btn.btn-inverse(type="submit") Sign in with password
+        .span6
+            h2 More Features
+            p Signing in to <strong>Malt<span style="opacity: 0.6">.io</span></strong> will give you more features!
+            ul
+                li Create and save recipes
+                li Edit recipes and track your history
+                li Log whenever you brew
+                li Review other's brews
+                li Clone recipes from other brewers
+                li Follow other brewers
+                li Like other's recipes
+                li And more!

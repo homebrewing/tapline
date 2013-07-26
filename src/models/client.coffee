@@ -11,11 +11,6 @@ ClientSchema = new mongoose.Schema
         type: String
     imageUrl:
         type: String
-    key:
-        type: String
-        unique: true
-        default: ->
-            crypto.randomBytes(10).toString 'hex'
     secret:
         type: String
         default: ->
@@ -25,5 +20,8 @@ ClientSchema = new mongoose.Schema
     created:
         type: Date
         default: Date.now
+    trusted:
+        type: Boolean
+        default: false
 
 module.exports = mongoose.model 'Client', ClientSchema

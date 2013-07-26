@@ -34,7 +34,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .post('/v1/authorizations.json')
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret)
                 .expect('Content-Type', /json/)
                 .expect(201)
                 .end (err, res) ->
@@ -50,7 +50,7 @@ describe '/v1/authorizations.json', ->
         it 'Should return error on missing basic auth', (done) ->
             request(app)
                 .post('/v1/authorizations.json')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret)
                 .expect 401, done
 
         it 'Should return error on invalid client id', (done) ->
@@ -64,7 +64,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .post('/v1/authorizations.json')
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: 'invalid')
+                .send(clientId: authInfo.client.id, clientSecret: 'invalid')
                 .expect 401, done
 
         it 'Should require client id', (done) ->
@@ -78,7 +78,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .post('/v1/authorizations.json')
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key)
+                .send(clientId: authInfo.client.id)
                 .expect 400, done
 
     describe 'List authorizations', ->
@@ -86,7 +86,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .get('/v1/authorizations.json')
                 .auth(authInfo.user.name, 'abc123')
-                .query(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .query(clientId: authInfo.client.id, clientSecret: authInfo.client.secret)
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .end (err, res) ->
@@ -99,7 +99,7 @@ describe '/v1/authorizations.json', ->
         it 'Should return error on missing basic auth', (done) ->
             request(app)
                 .get('/v1/authorizations.json')
-                .query(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .query(clientId: authInfo.client.id, clientSecret: authInfo.client.secret)
                 .expect 401, done
 
         it 'Should return error on invalid client id', (done) ->
@@ -113,7 +113,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .get('/v1/authorizations.json')
                 .auth(authInfo.user.name, 'abc123')
-                .query(clientId: authInfo.client.key, clientSecret: 'invalid')
+                .query(clientId: authInfo.client.id, clientSecret: 'invalid')
                 .expect 401, done
 
         it 'Should require client id', (done) ->
@@ -127,7 +127,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .get('/v1/authorizations.json')
                 .auth(authInfo.user.name, 'abc123')
-                .query(clientId: authInfo.client.key)
+                .query(clientId: authInfo.client.id)
                 .expect 400, done
 
     describe 'Update authorizations', ->
@@ -135,7 +135,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, scopes: ['test1', 'test2'])
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, scopes: ['test1', 'test2'])
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .end (err, res) ->
@@ -148,7 +148,7 @@ describe '/v1/authorizations.json', ->
         it 'Should return error on missing basic auth', (done) ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, scopes: [])
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, scopes: [])
                 .expect 401, done
 
         it 'Should return error on invalid client id', (done) ->
@@ -162,7 +162,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: 'invalid', scopes: [])
+                .send(clientId: authInfo.client.id, clientSecret: 'invalid', scopes: [])
                 .expect 401, done
 
         it 'Should require client id', (done) ->
@@ -176,28 +176,28 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, scopes: [])
+                .send(clientId: authInfo.client.id, scopes: [])
                 .expect 400, done
 
         it 'Should require scopes', (done) ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret)
                 .expect 400, done
 
         it 'Should set scopes', (done) ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, scopes: ['test1'])
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, scopes: ['test1'])
                 .expect 200, done
 
         it 'Should add scopes', (done) ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, addScopes: ['test2', 'test3'])
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, addScopes: ['test2', 'test3'])
                 .expect(200)
                 .end (err, res) ->
                     items = ['test1', 'test2', 'test3']
@@ -211,7 +211,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .put("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret, removeScopes: ['test2', 'test3'])
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, removeScopes: ['test2', 'test3'])
                 .expect(200)
                 .end (err, res) ->
                     items = ['test1']
@@ -225,7 +225,7 @@ describe '/v1/authorizations.json', ->
         it 'Should return error on missing basic auth', (done) ->
             request(app)
                 .del("/v1/authorizations/#{newAuthId}.json")
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret)
                 .expect 401, done
 
         it 'Should return error on invalid client id', (done) ->
@@ -239,7 +239,7 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .del("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: 'invalid')
+                .send(clientId: authInfo.client.id, clientSecret: 'invalid')
                 .expect 401, done
 
         it 'Should require client id', (done) ->
@@ -253,12 +253,12 @@ describe '/v1/authorizations.json', ->
             request(app)
                 .del("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key)
+                .send(clientId: authInfo.client.id)
                 .expect 400, done
 
         it 'Should return JSON on success', (done) ->
             request(app)
                 .del("/v1/authorizations/#{newAuthId}.json")
                 .auth(authInfo.user.name, 'abc123')
-                .send(clientId: authInfo.client.key, clientSecret: authInfo.client.secret)
+                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret)
                 .expect 204, done

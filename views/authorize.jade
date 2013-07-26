@@ -1,0 +1,36 @@
+extends layout
+
+block content
+    ul.breadcrumb
+        li
+            a(href="http://www.malt.io/") home
+            span.divider /
+        li
+            a(href="/account") account
+            span.divider /
+        li authorize
+    h2 Authorize Application
+    .alert.alert-info A third party application is requesting access to your <strong>Malt<span style="opacity: 0.6">.io</span></strong> information. Only grant access to applications that you know and trust.
+    .media
+        a.pull-left(href="")
+            img.media-object.img-polaroid(style="width: 80px; height: 80px;")
+        .media-body
+            h4 #{clientName}
+            | #{clientDescription}
+    h3 Requested Permissions
+    each values, desc in scopeMap
+        .row
+            div(class="span1 permission #{values[0]}") view
+            div(class="span1 permission #{values[1]}") edit
+            div(class="span1 permission #{values[2]}") delete
+            .span8.permission-desc #{desc}
+    .row
+        hr.span5
+    form(method="post")
+        input(type="hidden", name="clientId", value="#{clientId}")
+        input(type="hidden", name="scopes", value="#{scopes.join(',')}")
+        input(type="hidden", name="redirectUri", value="#{redirectUri}")
+        input(type="hidden", name="state", value="#{state}")
+        button.btn.btn-info(type="submit") Allow access
+        span &nbsp;&nbsp;or&nbsp;
+        a(href='/account') deny this request
