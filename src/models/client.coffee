@@ -11,11 +11,6 @@ ClientSchema = new mongoose.Schema
         type: String
     imageUrl:
         type: String
-    key:
-        type: String
-        unique: true
-        default: ->
-            crypto.randomBytes(10).toString 'hex'
     secret:
         type: String
         default: ->

@@ -110,6 +110,8 @@ app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
 
 app.post '/v1/users.json', userController.create
 
+app.post '/account/access_token', oauthController.postAccessToken
+
 # Basic authenticated routes
 app.post '/v1/authorizations.json', authBasic, authController.create
 app.get '/v1/authorizations.json', authBasic, authController.list
@@ -133,7 +135,6 @@ app.post '/account', ensureLogin, accountController.updateAccount
 
 app.get '/account/authorize', ensureLogin, oauthController.getAuthorization
 app.post '/account/authorize', ensureLogin, oauthController.postAuthorization
-app.post '/account/access_token', ensureLogin, oauthController.postAccessToken
 
 # Start the server
 exports.start = (listen, done) ->

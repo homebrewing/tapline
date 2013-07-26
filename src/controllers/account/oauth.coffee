@@ -105,12 +105,12 @@ oauthController.postAccessToken = (req, res) ->
             if err then return res.send(500, err.toString())
             if not grant then return res.send(404, 'Cannot find grant')
 
-            if grant.clientId isnt client.id or grant.userId isnt req.user.id
-                return res.send(401, 'Grant does not match client or user ID')
+            if not grant.clientId.equals(client.id)
+                return res.send(401, 'Grant does not match client ID')
 
             # Create the oauth token!
             token = new Authorization
-                userId: req.user.id
+                userId: grant.userId
                 clientId: client.id
                 scopes: grant.scopes
 

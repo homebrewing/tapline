@@ -67,9 +67,13 @@ deleteSchema = jsonGate.createSchema
             required: true
 
 # Get the client, making sure it exists and the secrets match up
-getClient = (key, secret, done) ->
-    Client.findOne {key}, (err, client) ->
-        if err then return done(err.toString(), 500)
+getClient = (id, secret, done) ->
+    Client.findOne _id: id, (err, client) ->
+        if err
+            if err.name is 'CastError'
+                done('Client not found', 401)
+            else
+                return done(err.toString(), 500)
         if not client then return done('Client not found', 401)
         if client.secret isnt secret then return done('Invalid client secret', 401)
 
