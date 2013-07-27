@@ -134,7 +134,7 @@ userController.create = (req, res) ->
             name: data.name
             email: data.email
             following: data.following
-            image: data.image or gravatar.url data.email, {s: 'SIZE'}
+            image: data.image or gravatar.url data.email, {s: 'SIZE', d: 'retro'}
 
         u.setPassword data.password, (err) ->
             if err then return res.send(500, err.toString())
