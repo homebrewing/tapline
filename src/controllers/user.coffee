@@ -1,3 +1,4 @@
+_ = require 'lodash'
 jsonGate = require 'json-gate'
 util = require '../util'
 
@@ -168,7 +169,7 @@ userController.update = (req, res) ->
 
             if passwordHash then update.passwordHash = passwordHash
 
-            if data.following then update.following = data.scopes
+            if data.following then update.following = data.following
             if data.addFollowing then update.$addToSet = {following: {$each: data.addFollowing, $slice: 100}}
             if data.removeFollowing then update.$pullAll = {following: data.removeFollowing}
 
@@ -178,7 +179,20 @@ userController.update = (req, res) ->
                 if err then return res.send(500, err.toString())
                 if not saved then return res.send(404, "User not found")
 
-                # TODO: Create user-followed actions
+                # Create user-followed actions if new users were followed
+                for added in _.without.apply(this, [saved.following].concat(req.user.following))
+                    User.findById added, (err, addedUser) ->
+                        if err then req.error(err.toString())
+
+                        if addedUser
+                            action = new Action
+                                userId: saved.id
+                                type: 'user-followed'
+                                targetId: addedUser.id
+                                data:
+                                    name: addedUser.name
+
+                            action.save()
 
                 res.json saved
 
