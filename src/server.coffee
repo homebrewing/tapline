@@ -119,6 +119,7 @@ app.put '/v1/authorizations/:id.json', authBasic, authController.update
 app.delete '/v1/authorizations/:id.json', authBasic, authController.delete
 
 # OAuth2 Authenticated routes
+app.get '/v1/profile.json', authBearer(), userController.profile
 app.get '/v1/users/:id?.json', authBearer(), userController.list
 app.put '/v1/users/:id.json', authBearer('user'), userController.update
 app.delete '/v1/users/:id.json', authBearer('user:delete'), userController.delete

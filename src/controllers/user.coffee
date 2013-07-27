@@ -109,6 +109,16 @@ userController.list = (req, res) ->
                 if err then return res.send(500, err.toString())
                 res.json users
 
+userController.profile = (req, res) ->
+    profile =
+        id: req.user.id
+        name: req.user.name
+
+    if req.authInfo?.scopes?.indexOf('user:email') isnt -1
+        profile.email = req.user.email
+
+    res.json profile
+
 userController.create = (req, res) ->
     creationSchema.validate req.body, (err, data) ->
         if err then return res.send(400, err.toString())
