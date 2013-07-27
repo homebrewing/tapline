@@ -22,6 +22,9 @@ UserSchema = new mongoose.Schema
         required: true
         unique: true
         lowercase: true
+    # An image URL template
+    image:
+        type: String
     # Hashed password
     passwordHash:
         type: String

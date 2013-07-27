@@ -1,4 +1,5 @@
 _ = require 'lodash'
+gravatar = require 'gravatar'
 jsonGate = require 'json-gate'
 util = require '../util'
 
@@ -43,6 +44,8 @@ creationSchema = jsonGate.createSchema
             type: 'string'
             required: true
             pattern: USERNAME_RE
+        image:
+            type: 'string'
         password:
             type: 'string'
             required: true
@@ -65,6 +68,8 @@ updateSchema = jsonGate.createSchema
         name:
             type: 'string'
             pattern: USERNAME_RE
+        image:
+            type: 'string'
         password:
             type: 'string'
         following:
@@ -114,6 +119,7 @@ userController.profile = (req, res) ->
     profile =
         id: req.user.id
         name: req.user.name
+        image: req.user.image
 
     if req.authInfo?.scopes?.indexOf('user:email') isnt -1
         profile.email = req.user.email
@@ -128,6 +134,7 @@ userController.create = (req, res) ->
             name: data.name
             email: data.email
             following: data.following
+            image: data.image or gravatar.url data.email, {s: 'SIZE'}
 
         u.setPassword data.password, (err) ->
             if err then return res.send(500, err.toString())
@@ -141,6 +148,7 @@ userController.create = (req, res) ->
                     type: 'user-joined'
                     data:
                         name: saved.name
+                        image: saved.image
 
                 action.save()
 
@@ -166,6 +174,7 @@ userController.update = (req, res) ->
 
             if data.email then update.email = data.email
             if data.name then update.name = data.name
+            if data.image then update.image = data.image
 
             if passwordHash then update.passwordHash = passwordHash
 
@@ -191,6 +200,7 @@ userController.update = (req, res) ->
                                 targetId: addedUser.id
                                 data:
                                     name: addedUser.name
+                                    image: addedUser.image
 
                             action.save()
 
@@ -212,5 +222,7 @@ userController.delete = (req, res) ->
 
         User.findByIdAndRemove data.id, (err) ->
             if err then return res.send(500, err.toString())
+
+            # TODO: Decide if this should remove actions/recipes/brews/etc
 
             res.send 204, null
