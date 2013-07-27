@@ -75,7 +75,7 @@
     "passport-http": "~0.2.2",
     "passport": "~0.1.17",
     "marked": "~0.2.9",
-    "jade": "~0.33.0",
+    "jade": "~0.34.1",
     "passport-local": "~0.1.6",
     "lodash": "~1.3.1"
   },
