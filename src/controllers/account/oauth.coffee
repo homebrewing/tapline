@@ -93,12 +93,12 @@ oauthController.postAccessToken = (req, res) ->
     # TODO: Check parameters
 
     # Get and verify the client is who he says he is
-    Client.findOne _id: req.body.clientId, (err, client) ->
+    Client.findOne _id: req.body.client_id, (err, client) ->
         if err then return res.send(500, err.toString())
         if not client then return res.send(404, 'Cannot find client')
 
         # Valid requests must include the client secret
-        if client.secret isnt req.body.clientSecret
+        if client.secret isnt req.body.client_secret
             return res.send(401, 'Invalid client secret')
 
         # Make sure the grant exists and is valid

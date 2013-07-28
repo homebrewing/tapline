@@ -78,7 +78,7 @@ describe '/account', ->
         it 'Should return an access token from a grant code', (done) ->
             request(app)
                 .post('/account/access_token')
-                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, code: grant)
+                .send(client_id: authInfo.client.id, client_secret: authInfo.client.secret, code: grant)
                 .expect(200)
                 .end (err, res) ->
                     if err then return done(err)
@@ -90,7 +90,7 @@ describe '/account', ->
         it 'Should return the same access token on subsequent requests', (done) ->
             request(app)
                 .post('/account/access_token')
-                .send(clientId: authInfo.client.id, clientSecret: authInfo.client.secret, code: grant)
+                .send(client_id: authInfo.client.id, client_secret: authInfo.client.secret, code: grant)
                 .expect(200)
                 .end (err, res) ->
                     if err then return done(err)
