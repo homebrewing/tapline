@@ -10,6 +10,7 @@ oauthController.getAuthorization = (req, res) ->
     scopes = (req.query.scope or '').split ','
 
     Grant.findOne userId: req.user.id, clientId: req.query.client_id, (err, grant) ->
+        if err.name is 'CastError' then return res.send(404, 'Cannot find client')
         if err then return res.send(500, err.toString())
 
         # TODO: Compare grant scopes - user may need to reauthorize new scopes
@@ -94,6 +95,7 @@ oauthController.postAccessToken = (req, res) ->
 
     # Get and verify the client is who he says he is
     Client.findOne _id: req.body.client_id, (err, client) ->
+        if err.name is 'CastError' then return res.send(404, 'Cannot find client')
         if err then return res.send(500, err.toString())
         if not client then return res.send(404, 'Cannot find client')
 
