@@ -122,12 +122,12 @@ oauthController.postAccessToken = (req, res) ->
                         if err then return res.send(500, err.toString())
 
                         res.json
-                            access_token: auth.code
+                            access_token: auth.token
                             token_type: 'bearer'
                 else
                     if _.isEqual(grant.scopes, auth.scopes)
                         res.json
-                            access_token: auth.code
+                            access_token: auth.token
                             token_type: 'bearer'
                     else
                         auth.scopes = grant.scopes
@@ -136,5 +136,5 @@ oauthController.postAccessToken = (req, res) ->
                             if err then return res.send(500, err.toString())
 
                             res.json
-                                access_token: auth.code
+                                access_token: auth.token
                                 token_type: 'bearer'
