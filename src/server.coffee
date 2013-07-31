@@ -1,3 +1,4 @@
+config = require './config'
 ensureLogin = require './middleware/ensure-login'
 express = require 'express'
 log = require './log'
@@ -41,7 +42,7 @@ app.configure ->
     app.use require('./middleware/log')
     # Web browser specific route middleware
     app.use '/account', express.cookieParser()
-    app.use '/account', express.session(secret: 'l3jh4532khg52')
+    app.use '/account', express.session(secret: config.cookieSecret)
     app.use passport.initialize()
     app.use '/account', passport.session()
     app.use '/account', require('./middleware/user')
