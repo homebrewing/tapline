@@ -12,7 +12,7 @@ block content
             p Please sign in to your <strong>Malt<span style="opacity: 0.6">.io</span></strong> account below.
             a.btn.btn-danger.btn-social <i class="icon-google-plus-sign"></i> Sign in with Google
             span(style="margin: 0 12px; opacity: 0.4") - or -
-            a.btn.btn-primary.btn-social.btn-facebook <i class="icon-facebook-sign"></i> Sign in with Facebook
+            a.btn.btn-primary.btn-social.btn-facebook(href="/auth/facebook") <i class="icon-facebook-sign"></i> Sign in with Facebook
             hr
             form(method="post")
                 input(type="hidden", name="next", value="#{next}")

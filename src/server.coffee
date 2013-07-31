@@ -9,6 +9,7 @@ path = require 'path'
 {BasicStrategy} = require 'passport-http'
 BearerStrategy = require('passport-http-bearer').Strategy
 LocalStrategy = require('passport-local').Strategy
+FacebookStrategy = require('passport-facebook').Strategy
 
 Authorization = require './models/authorization'
 User = require './models/user'
@@ -97,6 +98,29 @@ passport.deserializeUser (id, done) ->
     User.findOne _id: id, (err, user) ->
         done err, user
 
+# Social login with Facebook
+passport.use new FacebookStrategy {
+    clientID: config.facebookAppId
+    clientSecret: config.facebookAppSecret
+    callbackURL: 'https://api.malt.io/auth/facebook/callback'
+    },
+    (accessToken, refreshToken, profile, done) ->
+        User.findOne externalId: "fb:#{profile.id}", (err, user) ->
+            if err then return done(err)
+            if user then return done(null, user)
+
+            # Create a new user
+            user = new User
+                name: profile.displayName
+                email: profile.emails[0].value
+                externalId: "fb:#{profile.id}"
+                image: profile.photos[0].value
+
+            user.save (err, saved) ->
+                if err then return done(err)
+
+                done null, saved
+
 # =============
 # Define routes
 # =============
@@ -129,7 +153,7 @@ app.get '/v1/actions/:id?.json', authBearer(), actionController.list
 
 # HTML routes
 app.get '/account/login', loginController.loginPage
-app.post '/account/login', loginController.login
+app.post '/account/login', loginController.login('local')
 app.get '/account/logout', ensureLogin, loginController.logout
 
 app.get '/account', ensureLogin, accountController.accountPage
@@ -137,6 +161,9 @@ app.post '/account', ensureLogin, accountController.updateAccount
 
 app.get '/account/authorize', ensureLogin, oauthController.getAuthorization
 app.post '/account/authorize', ensureLogin, oauthController.postAuthorization
+
+app.get '/auth/facebook', passport.authenticate('facebook', scope: 'email')
+app.get '/auth/facebook/callback', loginController.login('facebook')
 
 # Start the server
 exports.start = (listen, done) ->

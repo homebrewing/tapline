@@ -12,6 +12,7 @@ mongoose.Document::toJSON = ->
 
     # Don't leak password hashes
     if json.passwordHash then delete json.passwordHash
+    if json.externalId then delete json.externalId
 
     # Don't leak emails
     if json.email then delete json.email

@@ -28,7 +28,9 @@ UserSchema = new mongoose.Schema
     # Hashed password
     passwordHash:
         type: String
-        required: true
+    # External ID, e.g. Google ID or Facebook ID
+    externalId:
+        type: String
     # Creation date
     created:
         type: Date
