@@ -8,6 +8,8 @@ authController.loginPage = (req, res) ->
 
 authController.login = (method) ->
     (req, res, next) ->
+        req.info "Authenticating via #{method}"
+
         passport.authenticate(method,
             successRedirect: req.body.next or '/account'
             failureRedirect: '/account/login'
