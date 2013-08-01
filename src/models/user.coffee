@@ -1,4 +1,5 @@
 mongoose = require 'mongoose'
+slug = require 'slug'
 util = require '../util'
 
 try
@@ -46,6 +47,27 @@ UserSchema = new mongoose.Schema
         type: Number
         default: 0
 
+UserSchema.statics =
+    # Get or create a new user from a third-party social service
+    findOrCreateExternal: (externalId, profile, done) ->
+        User.findOne {externalId}, (err, user) ->
+            if err then return done(err)
+            if user then return done(null, user)
+
+            # Create a new user
+            user = new User
+                name: slug(profile.displayName).toLowerCase()
+                email: profile.emails[0].value
+                externalId: externalId
+                image: profile.photos[0].value
+
+            user.save (err, saved) ->
+                if err then return done(err)
+
+                # TODO: Pick another name if it's taken...
+
+                done null, saved
+
 UserSchema.methods =
     # Authenticate a user, taking a password and a function (err, authenticated)
     # which will be called with authenticated=true if the password is correct.
@@ -66,4 +88,4 @@ UserSchema.methods =
             @passwordHash = hash
             done?()
 
-module.exports = mongoose.model 'User', UserSchema
+module.exports = User = mongoose.model 'User', UserSchema

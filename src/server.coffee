@@ -10,6 +10,7 @@ path = require 'path'
 BearerStrategy = require('passport-http-bearer').Strategy
 LocalStrategy = require('passport-local').Strategy
 FacebookStrategy = require('passport-facebook').Strategy
+GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
 Authorization = require './models/authorization'
 User = require './models/user'
@@ -102,24 +103,21 @@ passport.deserializeUser (id, done) ->
 passport.use new FacebookStrategy {
     clientID: config.facebookAppId
     clientSecret: config.facebookAppSecret
-    callbackURL: 'https://api.malt.io/auth/facebook/callback'
+    callbackURL: 'https://api.malt.io/account/authorize/facebook/callback'
     },
     (accessToken, refreshToken, profile, done) ->
-        User.findOne externalId: "fb:#{profile.id}", (err, user) ->
-            if err then return done(err)
-            if user then return done(null, user)
+        User.findOrCreateExternal "fb:#{profile.id}", profile, done
 
-            # Create a new user
-            user = new User
-                name: profile.displayName
-                email: profile.emails[0].value
-                externalId: "fb:#{profile.id}"
-                image: profile.photos[0].value
+# Social login with Google
+passport.use new GoogleStrategy {
+    clientID: config.googleConsumerKey
+    clientSecret: config.googleConsumerSecret
+    callbackURL: 'https://api.malt.io/account/authorize/google/callback'
+    },
+    (accessToken, refreshToken, profile, done) ->
+        profile.photos = [{value: "https://plus.google.com/s2/photos/profile/#{profile.id}?sz=SIZE"}]
 
-            user.save (err, saved) ->
-                if err then return done(err)
-
-                done null, saved
+        User.findOrCreateExternal "g:#{profile.id}", profile, done
 
 # =============
 # Define routes
@@ -164,6 +162,9 @@ app.post '/account/authorize', ensureLogin, oauthController.postAuthorization
 
 app.get '/auth/facebook', passport.authenticate('facebook', scope: 'email')
 app.get '/auth/facebook/callback', loginController.login('facebook')
+
+app.get '/account/authorize/google', passport.authenticate('google', scope: 'openid email profile')
+app.get '/account/authorize/google/callback', loginController.login('google')
 
 # Start the server
 exports.start = (listen, done) ->
