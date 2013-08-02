@@ -57,6 +57,14 @@ describe '/v1/users.json', ->
 
                     done()
 
+        it 'Should sort users based on location', (done) ->
+            request(app)
+                .get('/v1/users.json')
+                .query(sort: 'location')
+                .set('Authorization', "Bearer #{authInfo.auth.token}")
+                .expect('Content-Type', /json/)
+                .expect 200, done
+
     describe 'Update user', ->
         it 'Should return JSON on success', (done) ->
             request(app)

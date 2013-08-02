@@ -42,6 +42,11 @@ UserSchema = new mongoose.Schema
         maxItems: 100
         items:
             type: mongoose.Schema.Types.ObjectId
+    location:
+        type: mongoose.Schema.Types.Mixed
+        # Default is Seattle, WA
+        default: [122.3331, 47.6097]
+        index: '2dsphere'
     # Cached number of recipes owned
     recipeCount:
         type: Number

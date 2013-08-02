@@ -29,8 +29,15 @@ listSchema = jsonGate.createSchema
             max: 60
         sort:
             type: 'string'
-            enum: ['name', '-name', 'created', '-created', 'recipeCount', '-recipeCount']
+            enum: ['name', '-name', 'created', '-created', 'location',
+                   'recipeCount', '-recipeCount']
             default: 'name'
+        # If sort is location, this optionally sets the long/lat point
+        # which defaults to the current user's location if not set.
+        fromLong:
+            type: 'number'
+        fromLat:
+            type: 'number'
 
 # User creation request schema
 creationSchema = jsonGate.createSchema
@@ -54,6 +61,12 @@ creationSchema = jsonGate.createSchema
             maxItems: 100
             items:
                 type: 'string'
+        location:
+            type: 'array'
+            minItems: 2
+            maxItems: 2
+            items:
+                type: 'number'
 
 # User update request schema
 updateSchema = jsonGate.createSchema
@@ -87,6 +100,12 @@ updateSchema = jsonGate.createSchema
             maxItems: 100
             items:
                 type: 'string'
+        location:
+            type: 'array'
+            minItems: 2
+            maxItems: 2
+            items:
+                type: 'number'
 
 # User deletion request schema
 deleteSchema = jsonGate.createSchema
@@ -100,18 +119,43 @@ userController.list = (req, res) ->
     if req.params.id
         req.query.ids = req.params.id
 
-    util.queryConvert req.query, {ids: Array, offset: Number, limit: Number}, (err) ->
+    conversions =
+        ids: Array
+        offset: Number
+        limit: Number
+        fromLong: Number
+        fromLat: Number
+
+    util.queryConvert req.query, conversions, (err) ->
         if err then return res.send(400, err.toString())
 
         listSchema.validate req.query, (err, data) ->
             if err then return res.send(400, err.toString())
 
-            query = {}
+            select = {}
 
-            if data.ids then query._id =
+            if data.ids then select._id =
                 $in: data.ids
 
-            User.find(query).sort(data.sort).skip(data.offset).limit(data.limit).exec (err, users) ->
+            if data.sort is 'location'
+                coords = req.user.location
+
+                if data.fromLong
+                    coords = [data.fromLong, coords[1]]
+                if data.fromLat
+                    coords = [coords[0], data.fromLat]
+
+                select.location =
+                    $near:
+                        type: 'Point'
+                        coordinates: coords
+
+            query = User.find(select)
+
+            if data.sort isnt 'location'
+                query = query.sort(data.sort)
+
+            query.skip(data.offset).limit(data.limit).exec (err, users) ->
                 if err then return res.send(500, err.toString())
                 res.json users
 
@@ -135,6 +179,7 @@ userController.create = (req, res) ->
             email: data.email
             following: data.following
             image: data.image or gravatar.url data.email, {s: 'SIZE', d: 'retro'}
+            location: data.location
 
         u.setPassword data.password, (err) ->
             if err then return res.send(500, err.toString())
@@ -181,6 +226,8 @@ userController.update = (req, res) ->
             if data.following then update.following = data.following
             if data.addFollowing then update.$addToSet = {following: {$each: data.addFollowing, $slice: 100}}
             if data.removeFollowing then update.$pullAll = {following: data.removeFollowing}
+
+            if data.location then update.location = data.location
 
             User.findByIdAndUpdate data.id, update, (err, saved) ->
                 if err and err.code is util.ERROR_DB_DUPE
