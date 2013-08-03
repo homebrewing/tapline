@@ -81,7 +81,8 @@
     "gravatar": "~1.0.6",
     "passport-facebook": "~0.1.5",
     "passport-google-oauth": "~0.1.5",
-    "slug": "~0.3.3"
+    "slug": "~0.3.3",
+    "connect-mongo": "~0.3.3"
   },
   "optionalDependencies": {
     "bcrypt": "~0.7.6"

@@ -5,6 +5,8 @@ log = require './log'
 passport = require 'passport'
 path = require 'path'
 
+MongoStore = require('connect-mongo')(express)
+
 # Authentication strategies
 {BasicStrategy} = require 'passport-http'
 BearerStrategy = require('passport-http-bearer').Strategy
@@ -44,7 +46,10 @@ app.configure ->
     app.use require('./middleware/log')
     # Web browser specific route middleware
     app.use '/account', express.cookieParser()
-    app.use '/account', express.session(secret: config.cookieSecret)
+    app.use '/account', express.session
+        secret: config.cookieSecret
+        store: new MongoStore
+            db: 'tapline'
     app.use passport.initialize()
     app.use '/account', passport.session()
     app.use '/account', require('./middleware/user')
