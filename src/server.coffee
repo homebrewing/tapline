@@ -26,6 +26,7 @@ recipeCalculateController = require './controllers/calculate/recipe'
 authController = require './controllers/authorizations'
 userController = require './controllers/user'
 actionController = require './controllers/actions'
+recipeController = require './controllers/recipes'
 
 loginController = require './controllers/account/login'
 accountController = require './controllers/account/account'
@@ -153,6 +154,9 @@ app.put '/v1/users/:id.json', authBearer('user'), userController.update
 app.delete '/v1/users/:id.json', authBearer('user:delete'), userController.delete
 
 app.get '/v1/actions/:id?.json', authBearer(), actionController.list
+
+app.get '/v1/recipes/:id?.json', authBearer(), recipeController.list
+app.post '/v1/recipes.json', authBearer(), recipeController.create
 
 # HTML routes
 app.get '/account/login', loginController.loginPage

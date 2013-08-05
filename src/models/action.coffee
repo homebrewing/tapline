@@ -11,7 +11,7 @@ ActionSchema = new mongoose.Schema
     type:
         type: String
         required: true
-        enum: ['user-joined', 'user-followed']
+        enum: ['user-joined', 'user-followed', 'recipe-created']
     targetId:
         type: mongoose.Schema.Types.ObjectId
     private:

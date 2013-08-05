@@ -51,7 +51,7 @@ ensureClient = (user, done) ->
 
 # Create the test authorization
 ensureAuth = (user, client, done) ->
-    scopes = ['user', 'user:email', 'user:delete']
+    scopes = ['user', 'user:email', 'user:delete', 'private']
 
     Authorization.findOne {token: 'authTest'}, (err, auth) ->
         if err then return done(err)

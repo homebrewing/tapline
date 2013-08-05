@@ -62,6 +62,8 @@ exports.queryConvert = (obj, paramMap, done) ->
         if obj[param] is undefined then continue
 
         switch type
+            when Boolean
+                obj[param] = obj[param].toLowerCase() is 'true'
             when Number
                 if isNaN(obj[param])
                     return done("#{param} value '#{obj[param]}' could
