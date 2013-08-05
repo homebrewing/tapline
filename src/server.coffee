@@ -156,7 +156,8 @@ app.delete '/v1/users/:id.json', authBearer('user:delete'), userController.delet
 app.get '/v1/actions/:id?.json', authBearer(), actionController.list
 
 app.get '/v1/recipes/:id?.json', authBearer(), recipeController.list
-app.post '/v1/recipes.json', authBearer(), recipeController.create
+app.post '/v1/recipes.json', authBearer('recipe'), recipeController.create
+app.put '/v1/recipes/:id.json', authBearer('recipe'), recipeController.update
 
 # HTML routes
 app.get '/account/login', loginController.loginPage

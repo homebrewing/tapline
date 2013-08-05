@@ -50,6 +50,20 @@ creationSchema = jsonGate.createSchema
         recipe:
             type: 'any'
 
+updateSchema = jsonGate.createSchema
+    type: 'object'
+    properties:
+        id:
+            type: 'string'
+            required: true
+        private:
+            type: 'boolean'
+        detail:
+            type: 'boolean'
+            default: false
+        recipe:
+            type: 'any'
+
 # Serialize a recipe for a JSON response
 recipeController.serialize = (recipe, detail) ->
     r = new brauhaus.Recipe(recipe.data)
@@ -203,5 +217,31 @@ recipeController.create = (req, res) ->
                     color: recipeData.color
 
             action.save()
+
+            res.json recipeController.serialize(saved, data.detail)
+
+recipeController.update = (req, res) ->
+    params = _.extend {}, req.params, req.body
+    updateSchema.validate params, (err, data) ->
+        if err then return res.send(400, err.toString())
+
+        update =
+            modified: Date.now()
+
+        if data.private then update.private = data.private
+        if data.recipe
+            recipe = new brauhaus.Recipe(data.recipe)
+            recipe.calculate()
+
+            update.name = recipe.name
+            update.og = recipe.og
+            update.fg = recipe.fg
+            update.ibu = recipe.ibu
+            update.abv = recipe.abv
+            update.color = recipe.color
+            update.data = recipe
+
+        Recipe.findByIdAndUpdate data.id, update, (err, saved) ->
+            if err then return res.send(500, err.toString())
 
             res.json recipeController.serialize(saved, data.detail)
