@@ -7,12 +7,12 @@ A beer, wine, and mead homebrew API server based on [Brauhaus](https://github.co
 
  * Anonymous, public access to homebrewing calculators and converters
  * Account registration, authentication & authorization
+ * Recipe storage & retrieval
  * Persistent storage via [MongoDB](http://www.mongodb.org/)
  * Open source, MIT licensed
 
 Planned features include:
 
- * Recipe storage & retrieval
  * Recipe search
  * Recipe history (like Github for beer)
  * Brew logs
