@@ -47,7 +47,7 @@ actionsController.list = (req, res) ->
         listSchema.validate req.query, (err, data) ->
             if err then return res.send(400, err.toString())
 
-            query =
+            select =
                 $or: [
                     {private: false}
                 ]
@@ -55,13 +55,17 @@ actionsController.list = (req, res) ->
             if data.showPrivate is 'true'
                 if req.authInfo?.scopes?.indexOf('private') is -1
                     return res.send(401, 'Scope "private" required to view private actions!')
-                query.$or.push {private: true, userId: req.user.id}
+                select.$or.push {private: true, userId: req.user.id}
 
-            if data.userIds then query.$or[0].userId =
+            if data.userIds then select.$or[0].userId =
                 $in: data.userIds
-            else if data.ids then query.$or[0]._id =
+            else if data.ids then select.$or[0]._id =
                 $in: data.ids
 
-            Action.find(query).sort(data.sort).skip(data.offset).limit(data.limit).exec (err, actions) ->
+            query = Action.find(select).sort(data.sort).skip(data.offset).limit(data.limit)
+
+            query = query.populate('user', '_id name image')
+
+            query.exec (err, actions) ->
                 if err then return res.send(500, err.toString())
                 res.json actions

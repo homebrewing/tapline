@@ -189,7 +189,7 @@ userController.create = (req, res) ->
                 if err then return res.send(500, err.toString())
 
                 action = new Action
-                    userId: saved.id
+                    user: saved._id
                     type: 'user-joined'
                     data:
                         name: saved.name
@@ -242,7 +242,7 @@ userController.update = (req, res) ->
 
                         if addedUser
                             action = new Action
-                                userId: saved.id
+                                user: saved._id
                                 type: 'user-followed'
                                 targetId: addedUser.id
                                 data:

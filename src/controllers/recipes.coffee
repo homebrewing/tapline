@@ -189,7 +189,7 @@ recipeController.create = (req, res) ->
 
             # Create user action
             action = new Action
-                userId: req.user.id
+                user: req.user._id
                 type: 'recipe-created'
                 targetId: saved.id
                 private: recipe.private
