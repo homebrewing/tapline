@@ -53,6 +53,8 @@ actionsController.list = (req, res) ->
                 ]
 
             if data.showPrivate is 'true'
+                if req.authInfo?.scopes?.indexOf('private') is -1
+                    return res.send(401, 'Scope "private" required to view private actions!')
                 query.$or.push {private: true, userId: req.user.id}
 
             if data.userIds then query.$or[0].userId =
