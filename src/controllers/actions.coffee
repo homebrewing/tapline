@@ -58,8 +58,8 @@ actionsController.list = (req, res) ->
                     {private: false}
                 ]
 
-            if data.showPrivate is 'true'
-                if req.authInfo?.scopes?.indexOf('private') is -1
+            if data.showPrivate
+                if not req.user or req.authInfo?.scopes?.indexOf('private') is -1
                     return res.send(401, 'Scope "private" required to view private actions!')
                 select.$or.push {private: true, userId: req.user.id}
 

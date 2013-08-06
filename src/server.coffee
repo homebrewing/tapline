@@ -141,6 +141,8 @@ app.post '/v1/users.json', userController.create
 
 app.post '/account/access_token', oauthController.postAccessToken
 
+app.get '/v1/public/actions.json', actionController.list
+
 # Basic authenticated routes
 app.post '/v1/authorizations.json', authBasic, authController.create
 app.get '/v1/authorizations.json', authBasic, authController.list

@@ -36,3 +36,9 @@ describe '/v1/actions.json', ->
                     assert.ok res.body
 
                     done()
+
+        it 'Should get public user actions without auth', (done) ->
+            request(app)
+                .get('/v1/public/actions.json')
+                .expect('Content-Type', /json/)
+                .expect 200, done
