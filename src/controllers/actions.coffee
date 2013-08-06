@@ -22,9 +22,8 @@ listSchema = jsonGate.createSchema
             items:
                 type: 'string'
         showPrivate:
-            type: 'string'
-            enum: ['true', 'false']
-            default: 'true'
+            type: 'boolean'
+            default: false
         offset:
             type: 'number'
             default: 0
@@ -41,7 +40,14 @@ actionsController.list = (req, res) ->
     if req.params.id
         req.query.ids = req.params.id
 
-    util.queryConvert req.query, {userIds: Array, ids: Array, offset: Number, limit: Number}, (err) ->
+    conversions =
+        userIds: Array
+        ids: Array
+        offset: Number
+        limit: Number
+        showPrivate: Boolean
+
+    util.queryConvert req.query, conversions, (err) ->
         if err then return res.send(400, err.toString())
 
         listSchema.validate req.query, (err, data) ->
