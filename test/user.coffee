@@ -65,6 +65,12 @@ describe '/v1/users.json', ->
                 .expect('Content-Type', /json/)
                 .expect 200, done
 
+        it 'Should get public users without auth', (done) ->
+            request(app)
+                .get('/v1/public/users.json')
+                .expect('Content-Type', /json/)
+                .expect 200, done
+
     describe 'Update user', ->
         it 'Should return JSON on success', (done) ->
             request(app)

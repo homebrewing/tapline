@@ -66,6 +66,12 @@ describe '/v1/recipes.json', ->
 
                     done()
 
+        it 'Should get public recipes without auth', (done) ->
+            request(app)
+                .get('/v1/public/recipes.json')
+                .expect('Content-Type', /json/)
+                .expect 200, done
+
     describe 'Update recipes', ->
         it 'Should update a recipe successfully', (done) ->
             request(app)

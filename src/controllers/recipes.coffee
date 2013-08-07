@@ -156,7 +156,7 @@ recipeController.list = (req, res) ->
                 ]
 
             if data.showPrivate
-                if req.authInfo?.scopes?.indexOf('private') is -1
+                if not req.user or req.authInfo?.scopes?.indexOf('private') is -1
                     return res.send(401, 'Scope "private" required to view private recipes!')
                 select.$or.push {private: true, user: req.user._id}
 

@@ -138,7 +138,10 @@ userController.list = (req, res) ->
                 $in: data.ids
 
             if data.sort is 'location'
-                coords = req.user.location
+                if req.user
+                    coords = req.user.location
+                else
+                    coords = [0, 0]
 
                 if data.fromLong
                     coords = [data.fromLong, coords[1]]
