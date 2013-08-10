@@ -40,6 +40,7 @@ app.configure ->
     app.disable 'x-powered-by'
     app.set 'views', path.normalize(path.join("#{__dirname}", '..', 'views'))
     app.set 'view engine', 'jade'
+    app.use '/v1', require('./middleware/cors')
     app.use express.responseTime()
     app.use express.bodyParser()
     app.use express.methodOverride()
