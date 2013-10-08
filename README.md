@@ -85,12 +85,6 @@ Before submitting a pull request, please add any relevant tests and run them via
 npm test
 ```
 
-If you have PhantomJS installed and on your path then you can use:
-
-```bash
-CI=true npm test
-```
-
 Pull requests will automatically be tested by Travis CI Node.js 0.8/0.10. Changes that cause tests to fail will not be accepted. New features should be tested to be accepted.
 
 New tests can be added in the `test` directory.
