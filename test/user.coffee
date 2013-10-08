@@ -11,7 +11,7 @@ User = require '../lib/models/user'
 authInfo = {}
 userId = null
 
-describe '/v1/users.json', ->
+describe '/v1/users', ->
     before (done) ->
         db.connect util.testDb, (err) ->
             if err then return done(err)
@@ -31,7 +31,7 @@ describe '/v1/users.json', ->
     describe 'Register new user', ->
         it 'Should return JSON on success', (done) ->
             request(app)
-                .post('/v1/users.json')
+                .post('/v1/users')
                 .send(email: 'test@test.com', name: 'test_user', password: 'abc123')
                 .expect('Content-Type', /json/)
                 .expect(201)
@@ -46,7 +46,7 @@ describe '/v1/users.json', ->
     describe 'List users', ->
         it 'Should return JSON on success', (done) ->
             request(app)
-                .get('/v1/users.json')
+                .get('/v1/users')
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect('Content-Type', /json/)
                 .expect(200)
@@ -59,7 +59,7 @@ describe '/v1/users.json', ->
 
         it 'Should sort users based on location', (done) ->
             request(app)
-                .get('/v1/users.json')
+                .get('/v1/users')
                 .query(sort: 'location')
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect('Content-Type', /json/)
@@ -67,14 +67,14 @@ describe '/v1/users.json', ->
 
         it 'Should get public users without auth', (done) ->
             request(app)
-                .get('/v1/public/users.json')
+                .get('/v1/public/users')
                 .expect('Content-Type', /json/)
                 .expect 200, done
 
     describe 'Update user', ->
         it 'Should return JSON on success', (done) ->
             request(app)
-                .put("/v1/users/#{authInfo.user.id}.json")
+                .put("/v1/users/#{authInfo.user.id}")
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .send(name: 'test_user_updated')
                 .expect('Content-Type', /json/)
@@ -89,6 +89,6 @@ describe '/v1/users.json', ->
     describe 'Delete user', ->
         it 'Should return JSON on success', (done) ->
             request(app)
-                .del("/v1/users/#{authInfo.user.id}.json")
+                .del("/v1/users/#{authInfo.user.id}")
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect 204, done

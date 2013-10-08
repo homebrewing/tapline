@@ -8,7 +8,7 @@ util = require '../lib/util'
 
 authInfo = {}
 
-describe '/v1/actions.json', ->
+describe '/v1/actions', ->
     before (done) ->
         db.connect util.testDb, (err) ->
             if err then return done(err)
@@ -26,7 +26,7 @@ describe '/v1/actions.json', ->
     describe 'List user actions', ->
         it 'Should return JSON on success', (done) ->
             request(app)
-                .get('/v1/actions.json')
+                .get('/v1/actions')
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect('Content-Type', /json/)
                 .expect(200)
@@ -39,6 +39,6 @@ describe '/v1/actions.json', ->
 
         it 'Should get public user actions without auth', (done) ->
             request(app)
-                .get('/v1/public/actions.json')
+                .get('/v1/public/actions')
                 .expect('Content-Type', /json/)
                 .expect 200, done

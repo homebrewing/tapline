@@ -9,7 +9,7 @@ util = require '../lib/util'
 authInfo = {}
 recipeId = null
 
-describe '/v1/recipes.json', ->
+describe '/v1/recipes', ->
     before (done) ->
         db.connect util.testDb, (err) ->
             if err then return done(err)
@@ -27,7 +27,7 @@ describe '/v1/recipes.json', ->
     describe 'Create recipes', ->
         it 'Should successfully create a new recipe', (done) ->
             request(app)
-                .post('/v1/recipes.json')
+                .post('/v1/recipes')
                 .send(private: false, recipe: {name: 'Test recipe', fermentables: [{name: 'Pale malt', weight: 3.2}]})
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect(200)
@@ -41,7 +41,7 @@ describe '/v1/recipes.json', ->
     describe 'List recipes', ->
         it 'Should return JSON on success', (done) ->
             request(app)
-                .get('/v1/recipes.json')
+                .get('/v1/recipes')
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect('Content-Type', /json/)
                 .expect(200)
@@ -54,7 +54,7 @@ describe '/v1/recipes.json', ->
 
         it 'Should return private recipes', (done) ->
             request(app)
-                .get('/v1/recipes.json')
+                .get('/v1/recipes')
                 .query(showPrivate: true)
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect('Content-Type', /json/)
@@ -68,14 +68,14 @@ describe '/v1/recipes.json', ->
 
         it 'Should get public recipes without auth', (done) ->
             request(app)
-                .get('/v1/public/recipes.json')
+                .get('/v1/public/recipes')
                 .expect('Content-Type', /json/)
                 .expect 200, done
 
     describe 'Update recipes', ->
         it 'Should update a recipe successfully', (done) ->
             request(app)
-                .put("/v1/recipes/#{recipeId}.json")
+                .put("/v1/recipes/#{recipeId}")
                 .send(recipe: {name: 'Test recipe updated', fermentables: [{name: 'Pale malt', weight: 3.4}]})
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect(200)

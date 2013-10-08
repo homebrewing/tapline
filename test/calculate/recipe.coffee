@@ -13,7 +13,7 @@ recipeList = [
 describe 'Recipe Calculation', ->
     it 'Should respond with JSON on success', (done) ->
         request(app)
-            .post('/v1/calculate/recipe.json')
+            .post('/v1/calculate/recipe')
             .send(format: 'json', recipes: recipeList)
             .expect('Content-Type', /json/)
             .expect(200)
@@ -30,13 +30,13 @@ describe 'Recipe Calculation', ->
 
     it 'Should require a valid input format', (done) ->
         request(app)
-            .post('/v1/calculate/recipe.json')
+            .post('/v1/calculate/recipe')
             .send(recipes: recipeList)
             .expect(400, done)
 
     it 'Should require a valid input recipe list', (done) ->
         request(app)
-            .post('/v1/calculate/recipe.json')
+            .post('/v1/calculate/recipe')
             .send(format: 'json')
             .expect(400, done)
 
@@ -47,7 +47,7 @@ describe 'Recipe Calculation', ->
 
         it 'Should call Recipe.prototype.calculate', (done) ->
             request(app)
-                .post('/v1/calculate/recipe.json')
+                .post('/v1/calculate/recipe')
                 .send(format: 'json', recipes: recipeList)
                 .end (err, res) ->
                     assert.ok brauhaus.Recipe.prototype.calculate.called
@@ -55,7 +55,7 @@ describe 'Recipe Calculation', ->
 
         it 'Should call Recipe.prototype.timeline', (done) ->
             request(app)
-                .post('/v1/calculate/recipe.json')
+                .post('/v1/calculate/recipe')
                 .send(format: 'json', recipes: recipeList)
                 .end (err, res) ->
                     assert.ok brauhaus.Recipe.prototype.timeline.called
@@ -71,7 +71,7 @@ describe 'Recipe Calculation', ->
 
         it 'Should call getRecipeList to parse recipes', (done) ->
             request(app)
-                .post('/v1/calculate/recipe.json')
+                .post('/v1/calculate/recipe')
                 .send(format: 'json', recipes: [{name: 'foo'}])
                 .expect(200)
                 .end (err, res) ->

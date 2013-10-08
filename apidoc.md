@@ -14,7 +14,7 @@ Converts up to 25 durations from a number of minutes or a string representation 
 
 ### Request
 ```http
-POST /v1/convert/duration.json HTTP/1.1
+POST /v1/convert/duration HTTP/1.1
 Content-Type: application/json
 
 {
@@ -57,7 +57,7 @@ Converts up to 25 colors from SRM, EBC, or Lovibond into SRM, EBC, Lovibond, RGB
 
 ### Request
 ```http
-POST /v1/convert/color.json HTTP/1.1
+POST /v1/convert/color HTTP/1.1
 Content-Type: application/json
 
 {
@@ -105,7 +105,7 @@ Converts up to 10 recipes from/to a Brauhaus JSON representation and BeerXML. Va
 
 ### Request
 ```http
-POST /v1/convert/recipe.json HTTP/1.1
+POST /v1/convert/recipe HTTP/1.1
 Content-Type: application/json
 
 {
@@ -208,7 +208,7 @@ Create a new authorization for a third party client and a specific user. The res
 
 #### Request
 ```http
-POST /v1/authorizations.json HTTP/1.1
+POST /v1/authorizations HTTP/1.1
 Content-Type: application/json
 Authorization: Basic ZGFuaWVsOmFiYzEyMw==
 
@@ -255,7 +255,7 @@ List a third-party client's authorization tokens for a specific user. The respon
 
 #### Request
 ```http
-GET /v1/authorizations.json?clientId=abc123&clientSecret=some-secret HTTP/1.1
+GET /v1/authorizations?clientId=abc123&clientSecret=some-secret HTTP/1.1
 Content-Type: application/json
 Authorization: Basic ZGFuaWVsOmFiYzEyMw==
 ```
@@ -297,7 +297,7 @@ Scopes can be set to a new list via `scopes`, appended to via `addScopes` or rem
 
 #### Request
 ```http
-PUT /v1/authorizations/51deeb54763ce70000000001.json HTTP/1.1
+PUT /v1/authorizations/51deeb54763ce70000000001 HTTP/1.1
 Content-Type: application/json
 Authorization: Basic ZGFuaWVsOmFiYzEyMw==
 
@@ -344,7 +344,7 @@ Delete an existing authorization by its unique id. The request __must__ use HTTP
 
 #### Request
 ```http
-DELETE /v1/authorizations/51deeb54763ce70000000001.json HTTP/1.1
+DELETE /v1/authorizations/51deeb54763ce70000000001 HTTP/1.1
 Content-Type: application/json
 Authorization: Basic ZGFuaWVsOmFiYzEyMw==
 
@@ -384,7 +384,7 @@ The user `name` should be made up of lowercase letters, numbers, `-` and `_` so 
 
 ### Request
 ```http
-POST /v1/users.json HTTP/1.1
+POST /v1/users HTTP/1.1
 Content-Type: application/json
 
 {
@@ -423,7 +423,7 @@ Get a list of users. Two parameters are used for pagination: `offset` which defi
 
 ### Request
 ```http
-GET /v1/users.json?offset=10&limit=10&sort=-recipeCount HTTP/1.1
+GET /v1/users?offset=10&limit=10&sort=-recipeCount HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer b608d4b097c838067aba07eb9206faab1bf4b446
 ```

@@ -8,7 +8,7 @@ sinon = require 'sinon'
 describe 'Color Conversion', ->
     it 'Should respond with JSON on success', (done) ->
         request(app)
-            .post('/v1/convert/color.json')
+            .post('/v1/convert/color')
             .send(format: 'ebc', values: [39], outputFormat: 'srm')
             .expect('Content-Type', /json/)
             .expect(200)
@@ -22,7 +22,7 @@ describe 'Color Conversion', ->
 
     it 'Should convert multiple values', (done) ->
         request(app)
-            .post('/v1/convert/color.json')
+            .post('/v1/convert/color')
             .send(format: 'ebc', values: [39, 25, 14], outputFormat: 'srm')
             .expect('Content-Type', /json/)
             .expect(200)
@@ -32,25 +32,25 @@ describe 'Color Conversion', ->
 
     it 'Should have a default output format', (done) ->
         request(app)
-            .post('/v1/convert/color.json')
+            .post('/v1/convert/color')
             .send(format: 'ebc', values: [39])
             .expect(200, done)
 
     it 'Should require a valid input format', (done) ->
         request(app)
-            .post('/v1/convert/color.json')
+            .post('/v1/convert/color')
             .send(values: [39], outputFormat: 'srm')
             .expect(400, done)
 
     it 'Should require at least one input value', (done) ->
         request(app)
-            .post('/v1/convert/color.json')
+            .post('/v1/convert/color')
             .send(format: 'ebc', outputFormat: 'srm')
             .expect(400, done)
 
     it 'Should require input values to be numbers', (done) ->
         request(app)
-            .post('/v1/convert/color.json')
+            .post('/v1/convert/color')
             .send(format: 'ebc', values: ["foo"])
             .expect(400, done)
 
@@ -66,7 +66,7 @@ describe 'Color Conversion', ->
 
                 it "Should call brauhaus.#{method}", (done) ->
                     request(app)
-                        .post("/v1/convert/color.json")
+                        .post("/v1/convert/color")
                         .send(format: format, values: [20], outputFormat: 'srm')
                         .expect(200)
                         .end (err, res) ->
@@ -93,7 +93,7 @@ describe 'Color Conversion', ->
 
                 it "Should call brauhaus.#{method}", (done) ->
                     request(app)
-                        .post('/v1/convert/color.json')
+                        .post('/v1/convert/color')
                         .send(format: 'srm', values: [20], outputFormat: format)
                         .expect(200)
                         .end (err, res) ->

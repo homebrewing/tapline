@@ -9,7 +9,7 @@ util = require '../../lib/util'
 describe 'Recipe Conversion', ->
     it 'Should respond with JSON on success', (done) ->
         request(app)
-            .post('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe')
             .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: 'beerxml')
             .expect('Content-Type', /json/)
             .expect(200)
@@ -23,19 +23,19 @@ describe 'Recipe Conversion', ->
 
     it 'Should have a default output format', (done) ->
         request(app)
-            .post('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe')
             .send(format: 'json', recipes: [{name: 'foo'}])
             .expect(200, done)
 
     it 'Should require a valid input format', (done) ->
         request(app)
-            .post('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe')
             .send(recipes: [{name: 'foo'}], outputFormat: 'beerxml')
             .expect(400, done)
 
     it 'Should require an input value', (done) ->
         request(app)
-            .post('/v1/convert/recipe.json')
+            .post('/v1/convert/recipe')
             .send(format: 'json', outputFormat: 'beerxml')
             .expect(400, done)
 
@@ -45,7 +45,7 @@ describe 'Recipe Conversion', ->
 
         it 'Should call getRecipeList to parse recipes', (done) ->
             request(app)
-                .post('/v1/convert/recipe.json')
+                .post('/v1/convert/recipe')
                 .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: 'json')
                 .expect(200)
                 .end (err, res) ->
@@ -67,7 +67,7 @@ describe 'Recipe Conversion', ->
 
                 it "Should call Recipe.#{method}", (done) ->
                     request(app)
-                        .post('/v1/convert/recipe.json')
+                        .post('/v1/convert/recipe')
                         .send(format: 'json', recipes: [{name: 'foo'}], outputFormat: format)
                         .expect(200)
                         .end (err, res) ->

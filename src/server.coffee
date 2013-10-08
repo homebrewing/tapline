@@ -133,36 +133,36 @@ authBasic = passport.authenticate('basic', {session: false})
 authBearer = require './middleware/bearer'
 
 # Public routes
-app.post '/v1/convert/color.json', colorConvertController.convert
-app.post '/v1/convert/duration.json', durationConvertController.convert
-app.post '/v1/convert/recipe.json', recipeConvertController.convert
-app.post '/v1/calculate/recipe.json', recipeCalculateController.calculate
+app.post '/v1/convert/color', colorConvertController.convert
+app.post '/v1/convert/duration', durationConvertController.convert
+app.post '/v1/convert/recipe', recipeConvertController.convert
+app.post '/v1/calculate/recipe', recipeCalculateController.calculate
 
-app.post '/v1/users.json', userController.create
+app.post '/v1/users', userController.create
 
 app.post '/account/access_token', oauthController.postAccessToken
 
-app.get '/v1/public/users.json', userController.list
-app.get '/v1/public/actions.json', actionController.list
-app.get '/v1/public/recipes.json', recipeController.list
+app.get '/v1/public/users', userController.list
+app.get '/v1/public/actions', actionController.list
+app.get '/v1/public/recipes', recipeController.list
 
 # Basic authenticated routes
-app.post '/v1/authorizations.json', authBasic, authController.create
-app.get '/v1/authorizations.json', authBasic, authController.list
-app.put '/v1/authorizations/:id.json', authBasic, authController.update
-app.delete '/v1/authorizations/:id.json', authBasic, authController.delete
+app.post '/v1/authorizations', authBasic, authController.create
+app.get '/v1/authorizations', authBasic, authController.list
+app.put '/v1/authorizations/:id', authBasic, authController.update
+app.delete '/v1/authorizations/:id', authBasic, authController.delete
 
 # OAuth2 Authenticated routes
-app.get '/v1/profile.json', authBearer(), userController.profile
-app.get '/v1/users/:id?.json', authBearer(), userController.list
-app.put '/v1/users/:id.json', authBearer('user'), userController.update
-app.delete '/v1/users/:id.json', authBearer('user:delete'), userController.delete
+app.get '/v1/profile', authBearer(), userController.profile
+app.get '/v1/users/:id?', authBearer(), userController.list
+app.put '/v1/users/:id', authBearer('user'), userController.update
+app.delete '/v1/users/:id', authBearer('user:delete'), userController.delete
 
-app.get '/v1/actions/:id?.json', authBearer(), actionController.list
+app.get '/v1/actions/:id?', authBearer(), actionController.list
 
-app.get '/v1/recipes/:id?.json', authBearer(), recipeController.list
-app.post '/v1/recipes.json', authBearer('recipe'), recipeController.create
-app.put '/v1/recipes/:id.json', authBearer('recipe'), recipeController.update
+app.get '/v1/recipes/:id?', authBearer(), recipeController.list
+app.post '/v1/recipes', authBearer('recipe'), recipeController.create
+app.put '/v1/recipes/:id', authBearer('recipe'), recipeController.update
 
 # HTML routes
 app.get '/account/login', loginController.loginPage
