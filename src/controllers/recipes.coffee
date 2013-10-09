@@ -5,6 +5,9 @@ util = require '../util'
 
 Action = require '../models/action'
 Recipe = require '../models/recipe'
+RecipeHistory = require '../models/recipeHistory'
+
+require 'brauhaus-diff'
 
 recipeController = exports
 
@@ -242,7 +245,35 @@ recipeController.update = (req, res) ->
             update.color = recipe.color
             update.data = recipe
 
-        Recipe.findByIdAndUpdate data.id, update, (err, saved) ->
-            if err then return res.send(500, err.toString())
+            #req.info(require('util').inspect(update))
 
-            res.json recipeController.serialize(saved, data.detail)
+        Recipe.findById data.id, (err, original) ->
+            if err then return res.send(500, err.toString())
+            if not original then return res.send(404, 'Recipe not found')
+
+            if data.recipe
+                # Generate a diff of the old vs. new recipe
+                diff = brauhaus.Diff.diff(new brauhaus.Recipe(original.data).toJSON(), recipe.toJSON())
+                if Object.keys(diff).length
+                    req.info('Diff: ' + require('util').inspect(diff, 10))
+                    req.info 'Saving diff into history stack...'
+
+                    # TODO: Should this be replaced with an atomic action that
+                    # upserts to create the entry when needed???
+                    RecipeHistory.findOne recipe: original.id, (err, history) ->
+                        if err then return req.error(err)
+
+                        if not history
+                            history = new RecipeHistory
+                                recipe: original.id
+
+                        history.entries ?= []
+                        history.entries.push diff
+
+                        history.save (err) ->
+                            if err then console.log err
+
+            Recipe.findByIdAndUpdate data.id, update, (err, saved) ->
+                if err then return res.send(500, err.toString())
+
+                res.json recipeController.serialize(saved, data.detail)

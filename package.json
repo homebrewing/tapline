@@ -82,7 +82,8 @@
     "passport-facebook": "~1.0.1",
     "passport-google-oauth": "~0.1.5",
     "slug": "~0.3.3",
-    "connect-mongo": "~0.3.3"
+    "connect-mongo": "~0.3.3",
+    "brauhaus-diff": "~0.2"
   },
   "optionalDependencies": {
     "bcrypt": "~0.7.6"
