@@ -232,6 +232,7 @@ recipeController.update = (req, res) ->
         if data.recipe
             recipe = new brauhaus.Recipe(data.recipe)
             recipe.calculate()
+            recipe.timeline()
 
             update.name = recipe.name
             update.og = recipe.og
