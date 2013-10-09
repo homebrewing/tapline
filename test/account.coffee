@@ -16,6 +16,8 @@ token = null
 
 describe '/account', ->
     before (done) ->
+        @timeout 10000
+
         db.connect util.testDb, (err) ->
             if err then return done(err)
 
@@ -31,6 +33,8 @@ describe '/account', ->
 
     describe 'Login', ->
         it 'Should return HTML on success', (done) ->
+            @timeout 5000
+
             request(app)
                 .get('/account/login')
                 .expect('Content-Type', /html/)
