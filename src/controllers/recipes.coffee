@@ -255,9 +255,6 @@ recipeController.update = (req, res) ->
                 # Generate a diff of the old vs. new recipe
                 diff = brauhaus.Diff.diff(new brauhaus.Recipe(original.data).toJSON(), recipe.toJSON())
                 if Object.keys(diff).length
-                    req.info('Diff: ' + require('util').inspect(diff, 10))
-                    req.info 'Saving diff into history stack...'
-
                     # TODO: Should this be replaced with an atomic action that
                     # upserts to create the entry when needed???
                     RecipeHistory.findOne recipe: original.id, (err, history) ->
