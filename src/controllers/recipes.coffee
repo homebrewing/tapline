@@ -275,4 +275,21 @@ recipeController.update = (req, res) ->
             Recipe.findByIdAndUpdate data.id, update, (err, saved) ->
                 if err then return res.send(500, err.toString())
 
+                # Create user action
+                action = new Action
+                    user: req.user._id
+                    type: 'recipe-updated'
+                    targetId: saved.id
+                    private: saved.private
+                    data:
+                        name: saved.name
+                        description: saved.description
+                        og: saved.og
+                        fg: saved.fg
+                        ibu: saved.ibu
+                        abv: saved.abv
+                        color: saved.color
+
+                action.save()
+
                 res.json recipeController.serialize(saved, data.detail)
