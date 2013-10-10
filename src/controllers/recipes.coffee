@@ -265,7 +265,9 @@ recipeController.update = (req, res) ->
                                 recipe: original.id
 
                         history.entries ?= []
-                        history.entries.push diff
+                        history.entries.push
+                            date: Date.now()
+                            diff: diff
 
                         history.save (err) ->
                             if err then console.log err
