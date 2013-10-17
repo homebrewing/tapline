@@ -16,7 +16,13 @@ listSchema = jsonGate.createSchema
     properties:
         ids:
             type: 'array'
-            minItems: 1
+            minItems: 0
+            maxItems: 60
+            items:
+                type: 'string'
+        names:
+            type: 'array'
+            minItems: 0
             maxItems: 60
             items:
                 type: 'string'
@@ -121,6 +127,7 @@ userController.list = (req, res) ->
 
     conversions =
         ids: Array
+        names: Array
         offset: Number
         limit: Number
         fromLong: Number
@@ -136,6 +143,9 @@ userController.list = (req, res) ->
 
             if data.ids then select._id =
                 $in: data.ids
+
+            if data.names then select.name =
+                $in: data.names
 
             if data.sort is 'location'
                 if req.user
