@@ -63,7 +63,7 @@ actionsController.list = (req, res) ->
                     return res.send(401, 'Scope "private" required to view private actions!')
                 select.$or.push {private: true, userId: req.user.id}
 
-            if data.userIds then select.$or[0].userId =
+            if data.userIds then select.$or[0].user =
                 $in: data.userIds
             else if data.ids then select.$or[0]._id =
                 $in: data.ids
