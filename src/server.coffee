@@ -142,9 +142,10 @@ app.post '/v1/users', userController.create
 
 app.post '/account/access_token', oauthController.postAccessToken
 
-app.get '/v1/public/users', userController.list
-app.get '/v1/public/actions', actionController.list
-app.get '/v1/public/recipes', recipeController.list
+app.get '/v1/public/users/:id?', userController.list
+app.get '/v1/public/actions/:id?', actionController.list
+app.get '/v1/public/recipes/:id?', recipeController.list
+#app.get '/v1/public/recipes/:id/history/:hid?', recipeController.history
 
 # Basic authenticated routes
 app.post '/v1/authorizations', authBasic, authController.create
@@ -163,6 +164,8 @@ app.get '/v1/actions/:id?', authBearer(), actionController.list
 app.get '/v1/recipes/:id?', authBearer(), recipeController.list
 app.post '/v1/recipes', authBearer('recipe'), recipeController.create
 app.put '/v1/recipes/:id', authBearer('recipe'), recipeController.update
+
+# app.get '/v1/recipes/:id/history/:hid?', authBearer('recipe'), recipeController.history
 
 # HTML routes
 app.get '/account/login', loginController.loginPage
