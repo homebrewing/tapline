@@ -21,6 +21,12 @@ listSchema = jsonGate.createSchema
             maxItems: 60
             items:
                 type: 'string'
+        userIds:
+            type: 'array'
+            minItems: 1
+            maxItems: 60
+            items:
+                type: 'string'
         offset:
             type: 'number'
             default: 0
@@ -142,6 +148,7 @@ recipeController.list = (req, res) ->
 
     conversions =
         ids: Array
+        userIds: Array
         offset: Number
         limit: Number
         detail: Boolean
@@ -165,6 +172,9 @@ recipeController.list = (req, res) ->
 
             if data.ids then select._id =
                 $in: data.ids
+
+            if data.userIds then select.user =
+                $in: data.userIds
 
             query = Recipe.find select
 
