@@ -8,17 +8,17 @@ A beer, wine, and mead homebrew API server based on [Brauhaus](https://github.co
  * Anonymous, public access to homebrewing calculators and converters
  * Account registration, authentication & authorization
  * Recipe storage & retrieval
+ * Recipe history (like Github for beer)
  * Persistent storage via [MongoDB](http://www.mongodb.org/)
+ * Social features
+  * Follow other brewers
+  * Clone and share recipes
  * Open source, MIT licensed
 
 Planned features include:
 
  * Recipe search
- * Recipe history (like Github for beer)
  * Brew logs
- * Social features
-  * Follow other brewers
-  * Clone and share recipes
 
 Tapline was developed with and for [Malt.io](http://www.malt.io/), a community website for homebrewers to create recipes and share their love of homebrewing beer.
 
