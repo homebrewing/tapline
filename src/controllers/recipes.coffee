@@ -1,6 +1,7 @@
 _ = require 'lodash'
 brauhaus = require 'brauhaus'
 jsonGate = require 'json-gate'
+slug = require 'slug'
 util = require '../util'
 
 Action = require '../models/action'
@@ -22,6 +23,12 @@ listSchema = jsonGate.createSchema
             items:
                 type: 'string'
         userIds:
+            type: 'array'
+            minItems: 1
+            maxItems: 60
+            items:
+                type: 'string'
+        slugs:
             type: 'array'
             minItems: 1
             maxItems: 60
@@ -138,6 +145,7 @@ recipeController.serialize = (recipe, detail) ->
     serialized =
         id: recipe.id
         user: recipe.user
+        slug: recipe.slug
         created: recipe.created
         private: recipe.private
         data: recipeData
@@ -149,6 +157,7 @@ recipeController.list = (req, res) ->
     conversions =
         ids: Array
         userIds: Array
+        slugs: Array
         offset: Number
         limit: Number
         detail: Boolean
@@ -175,6 +184,9 @@ recipeController.list = (req, res) ->
 
             if data.userIds then select.user =
                 $in: data.userIds
+
+            if data.slugs then select.slug =
+                $in: data.slugs
 
             query = Recipe.find select
 
@@ -203,6 +215,7 @@ recipeController.create = (req, res) ->
         recipe = new Recipe
             user: req.user
             name: recipeData.name
+            slug: slug(recipeData.name).toLowerCase()
             og: recipeData.og
             fg: recipeData.fg
             ibu: recipeData.ibu
@@ -222,6 +235,7 @@ recipeController.create = (req, res) ->
                 private: recipe.private
                 data:
                     name: recipe.name
+                    slug: recipe.slug
                     description: recipe.description
                     og: recipeData.og
                     fg: recipeData.fg
@@ -248,6 +262,7 @@ recipeController.update = (req, res) ->
             recipe.timeline()
 
             update.name = recipe.name
+            update.slug = slug(recipe.name).toLowerCase()
             update.og = recipe.og
             update.fg = recipe.fg
             update.ibu = recipe.ibu
@@ -293,6 +308,7 @@ recipeController.update = (req, res) ->
                     private: saved.private
                     data:
                         name: saved.name
+                        slug: saved.slug
                         description: saved.description
                         og: saved.og
                         fg: saved.fg

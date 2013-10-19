@@ -15,6 +15,8 @@ RecipeSchema = new mongoose.Schema
         default: Date.now
     name:
         type: String
+    slug:
+        type: String
     og:
         type: Number
     fg:
