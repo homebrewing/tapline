@@ -140,7 +140,7 @@ app.post '/v1/calculate/recipe', recipeCalculateController.calculate
 
 app.post '/v1/users', userController.create
 
-app.post '/account/access_token', oauthController.postAccessToken
+app.post '/account/access_token', require('./middleware/cors'), oauthController.postAccessToken
 
 app.get '/v1/public/users/:id?', userController.list
 app.get '/v1/public/actions/:id?', actionController.list
