@@ -16,7 +16,9 @@ ClientSchema = new mongoose.Schema
         default: ->
             crypto.randomBytes(20).toString 'hex'
     redirectUri:
-        type: String
+        type: Array
+        items:
+            type: String
     created:
         type: Date
         default: Date.now

@@ -64,7 +64,7 @@ describe '/account', ->
         it 'Should return a grant code and state to redirectUri', (done) ->
             request(app)
                 .post('/account/authorize')
-                .send(clientId: authInfo.client.id, scopes: 'user,recipe', state: 'test', redirectUri: 'foo')
+                .send(clientId: authInfo.client.id, scopes: 'user,recipe', state: 'test', redirectUri: 'foo', type: 'web_server')
                 .set('Cookie', cookie)
                 .expect(302)
                 .expect('Location', /foo/)

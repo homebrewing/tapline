@@ -5,6 +5,41 @@ Grant = require '../../models/grant'
 
 oauthController = module.exports
 
+redirectAllowed = (redirectUri, client) ->
+    allowed = false
+
+    for possible in client.redirectUri
+        if redirectUri is possible
+            allowed = true
+            break
+
+    return allowed
+
+authFromGrant = (grant, done) ->
+    Authorization.findOne userId: grant.userId, clientId: grant.clientId, (err, auth) ->
+        if err then return done(err)
+        if not auth
+            # Create the oauth token!
+            auth = new Authorization
+                userId: grant.userId
+                clientId: grant.clientId
+                scopes: grant.scopes
+
+            auth.save (err, auth) ->
+                if err then return done(err)
+
+                done null, auth
+        else
+            if _.isEqual(grant.scopes, auth.scopes)
+                done null, auth
+            else
+                auth.scopes = grant.scopes
+
+                auth.save (err, auth) ->
+                    if err then return done(err)
+
+                    done null, auth
+
 oauthController.getAuthorization = (req, res) ->
     # TODO: check parameters
     scopes = (req.query.scope or '').split ','
@@ -16,7 +51,19 @@ oauthController.getAuthorization = (req, res) ->
         # TODO: Compare grant scopes - user may need to reauthorize new scopes
 
         if grant
-            res.redirect "#{req.query.redirect_uri}?code=#{grant.code}&state=#{req.query.state}"
+            switch req.query.type
+                when 'web_server'
+                    res.redirect "#{req.query.redirect_uri}?code=#{grant.code}&state=#{req.query.state}"
+                when 'token'
+                    Client.findOne _id: req.query.client_id, (err, client) ->
+                        if redirectAllowed req.query.redirect_uri, client
+                            authFromGrant grant, (err, auth) ->
+                                if err then return res.send 500, err.toString()
+                                res.redirect "#{req.query.redirect_uri}#access_token:#{auth.token}"
+                        else
+                            res.send 400, "Redirect not allowed: #{req.query.redirect_uri}"
+                else
+                    return res.send 400, "Invalid type #{req.query.type}"
         else
             Client.findOne _id: req.query.client_id, (err, client) ->
                 if err then return res.send(500, err.toString())
@@ -32,7 +79,19 @@ oauthController.getAuthorization = (req, res) ->
 
                     grant.save (err) ->
                         if err then return res.send(500, err.toString())
-                        res.redirect "#{req.query.redirect_uri}?code=#{grant.code}&state=#{req.query.state}"
+
+                        switch req.query.type
+                            when 'web_server'
+                                res.redirect "#{req.query.redirect_uri}?code=#{grant.code}&state=#{req.query.state}"
+                            when 'token'
+                                if redirectAllowed req.query.redirect_uri, client
+                                    authFromGrant grant, (err, auth) ->
+                                        if err then return res.send 500, err.toString()
+                                        res.redirect "#{req.query.redirect_uri}#access_token:#{auth.token}"
+                                else
+                                    res.send 400, "Redirect not allowed: #{req.query.redirect_uri}"
+                            else
+                                return res.send 400, "Invalid type #{req.query.type}"
                 else
                     scopeMap =
                         'Public user account information': [
@@ -73,6 +132,7 @@ oauthController.getAuthorization = (req, res) ->
                         scopeMap: scopeMap
                         scopes: scopes
                         state: req.query.state
+                        type: req.query.type
                         redirectUri: req.query.redirect_uri
 
 oauthController.postAuthorization = (req, res) ->
@@ -88,7 +148,19 @@ oauthController.postAuthorization = (req, res) ->
 
         grant.save (err, grant) ->
             if err then return res.send(500, err.toString())
-            res.redirect "#{req.body.redirectUri}?code=#{grant.code}&state=#{req.body.state}"
+
+            switch req.body.type
+                when 'web_server'
+                    res.redirect "#{req.body.redirectUri}?code=#{grant.code}&state=#{req.body.state}"
+                when 'token'
+                    if redirectAllowed req.body.redirectUri, client
+                        authFromGrant grant, (err, auth) ->
+                            if err then return res.send 500, err.toString()
+                            res.redirect "#{req.body.redirectUri}#access_token:#{auth.token}"
+                    else
+                        res.send 400, "Redirect not allowed: #{req.body.redirectUri}"
+                else
+                    return res.send 400, "Invalid type #{req.body.type}"
 
 oauthController.postAccessToken = (req, res) ->
     # TODO: Check parameters
@@ -111,32 +183,9 @@ oauthController.postAccessToken = (req, res) ->
             if not grant.clientId.equals(client.id)
                 return res.send(401, 'Grant does not match client ID')
 
-            Authorization.findOne userId: grant.userId, clientId: grant.clientId, (err, auth) ->
-                if err then return res.send(500, err.toString())
-                if not auth
-                    # Create the oauth token!
-                    auth = new Authorization
-                        userId: grant.userId
-                        clientId: client.id
-                        scopes: grant.scopes
+            authFromGrant grant, (err, auth) ->
+                if err then return res.send 500, err.toString()
 
-                    auth.save (err, auth) ->
-                        if err then return res.send(500, err.toString())
-
-                        res.json
-                            access_token: auth.token
-                            token_type: 'bearer'
-                else
-                    if _.isEqual(grant.scopes, auth.scopes)
-                        res.json
-                            access_token: auth.token
-                            token_type: 'bearer'
-                    else
-                        auth.scopes = grant.scopes
-
-                        auth.save (err, auth) ->
-                            if err then return res.send(500, err.toString())
-
-                            res.json
-                                access_token: auth.token
-                                token_type: 'bearer'
+                res.json
+                    access_token: auth.token
+                    token_type: 'bearer'

@@ -29,6 +29,7 @@ block content
     form(method="post")
         input(type="hidden", name="clientId", value="#{clientId}")
         input(type="hidden", name="scopes", value="#{scopes.join(',')}")
+        input(type="hidden", name="type", value="#{type}")
         input(type="hidden", name="redirectUri", value="#{redirectUri}")
         input(type="hidden", name="state", value="#{state}")
         button.btn.btn-info(type="submit") Allow access
