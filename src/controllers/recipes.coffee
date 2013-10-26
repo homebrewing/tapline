@@ -236,7 +236,7 @@ recipeController.create = (req, res) ->
                 data:
                     name: recipe.name
                     slug: recipe.slug
-                    description: recipe.description
+                    description: recipeData.description
                     og: recipeData.og
                     fg: recipeData.fg
                     ibu: recipeData.ibu
@@ -309,7 +309,7 @@ recipeController.update = (req, res) ->
                     data:
                         name: saved.name
                         slug: saved.slug
-                        description: saved.description
+                        description: saved.data.description
                         og: saved.og
                         fg: saved.fg
                         ibu: saved.ibu
