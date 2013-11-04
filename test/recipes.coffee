@@ -85,3 +85,10 @@ describe '/v1/recipes', ->
                     assert.equal 3.4, res.body.data.fermentables[0].weight
 
                     done()
+
+    describe 'Delete recipes', ->
+        it 'Should delete a recipe successfully', (done) ->
+            request(app)
+                .del("/v1/recipes/#{recipeId}")
+                .set('Authorization', "Bearer #{authInfo.auth.token}")
+                .expect 204, done

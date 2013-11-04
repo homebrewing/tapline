@@ -80,6 +80,13 @@ updateSchema = jsonGate.createSchema
         recipe:
             type: 'any'
 
+deleteSchema = jsonGate.createSchema
+    type: 'object'
+    properties:
+        id:
+            type: 'string'
+            required: true
+
 # Serialize a recipe for a JSON response
 recipeController.serialize = (recipe, detail) ->
     r = new brauhaus.Recipe(recipe.data)
@@ -276,6 +283,9 @@ recipeController.update = (req, res) ->
             if err then return res.send(500, err.toString())
             if not original then return res.send(404, 'Recipe not found')
 
+            if req.user.id.toString() isnt original.user.toString()
+                return res.send 401, "Recipe owner does not match user ID"
+
             if data.recipe
                 # Generate a diff of the old vs. new recipe
                 diff = brauhaus.Diff.diff(new brauhaus.Recipe(original.data).toJSON(), recipe.toJSON())
@@ -319,3 +329,19 @@ recipeController.update = (req, res) ->
                 action.save()
 
                 res.json recipeController.serialize(saved, data.detail)
+
+recipeController.delete = (req, res) ->
+    params = util.extend {}, req.params
+    deleteSchema.validate params, (err, data) ->
+        if err then return res.send(400, err.toString())
+
+        Recipe.findById data.id, (err, recipe) ->
+            if err then return res.send(500, err.toString())
+
+            if req.user.id.toString() isnt recipe.user.toString()
+                return res.send 401, "Recipe owner does not match user ID"
+
+            recipe.remove (err) ->
+                if err then return res.send(500, err.toString())
+
+                res.send 204, null

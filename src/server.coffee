@@ -164,6 +164,7 @@ app.get '/v1/actions/:id?', authBearer(), actionController.list
 app.get '/v1/recipes/:id?', authBearer(), recipeController.list
 app.post '/v1/recipes', authBearer('recipe'), recipeController.create
 app.put '/v1/recipes/:id', authBearer('recipe'), recipeController.update
+app.delete '/v1/recipes/:id', authBearer('recipe'), recipeController.delete
 
 # app.get '/v1/recipes/:id/history/:hid?', authBearer('recipe'), recipeController.history
 
