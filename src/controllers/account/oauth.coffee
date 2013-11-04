@@ -51,6 +51,8 @@ oauthController.getAuthorization = (req, res) ->
         # TODO: Compare grant scopes - user may need to reauthorize new scopes
 
         if grant
+            # Set new scopes on the grant, which get passed along to the authorization
+            grant.scopes = scopes
             switch req.query.type
                 when 'web_server'
                     res.redirect "#{req.query.redirect_uri}?code=#{grant.code}&state=#{req.query.state}"
