@@ -87,8 +87,16 @@ deleteSchema = jsonGate.createSchema
             type: 'string'
             required: true
 
+# Increment a slug by one, adding '-1' if no number
+# is already present.
+incrementSlug = (slug) ->
+    if isNaN slug.substr(slug.length - 1)
+        "#{slug}-1"
+    else
+        slug.replace /\d+$/, (n) -> ++n
+
 # Serialize a recipe for a JSON response
-recipeController.serialize = (recipe, detail) ->
+recipeController.serialize = (recipe, user, detail) ->
     r = new brauhaus.Recipe(recipe.data)
 
     recipeData =
@@ -151,7 +159,10 @@ recipeController.serialize = (recipe, detail) ->
 
     serialized =
         id: recipe.id
-        user: recipe.user
+        user:
+            id: user.id
+            name: user.name
+            image: user.image
         slug: recipe.slug
         created: recipe.created
         private: recipe.private
@@ -205,7 +216,7 @@ recipeController.list = (req, res) ->
                 if err then return res.send(500, err.toString())
 
                 responses = for recipe in recipes
-                    recipeController.serialize recipe, data.detail
+                    recipeController.serialize recipe, recipe.user, data.detail
 
                 res.json responses
 
@@ -220,7 +231,7 @@ recipeController.create = (req, res) ->
         recipeData.calculate()
 
         recipe = new Recipe
-            user: req.user
+            user: req.user._id
             name: recipeData.name
             slug: slug(recipeData.name).toLowerCase()
             og: recipeData.og
@@ -231,7 +242,11 @@ recipeController.create = (req, res) ->
             private: data.private
             data: recipeData.toJSON()
 
-        recipe.save (err, saved) ->
+        saveHandler = (err, saved) ->
+            if err?.code is util.ERROR_DB_DUPE
+                recipe.slug = incrementSlug recipe.slug
+                return recipe.save saveHandler
+
             if err then return res.send(500, err.toString())
 
             # Create user action
@@ -252,7 +267,9 @@ recipeController.create = (req, res) ->
 
             action.save()
 
-            res.json recipeController.serialize(saved, data.detail)
+            res.json recipeController.serialize(saved, req.user, data.detail)
+
+        recipe.save saveHandler
 
 recipeController.update = (req, res) ->
     params = _.extend {}, req.params, req.body
@@ -307,7 +324,14 @@ recipeController.update = (req, res) ->
                         history.save (err) ->
                             if err then console.log err
 
-            Recipe.findByIdAndUpdate data.id, update, (err, saved) ->
+            updateHandler = (err, saved) ->
+                # findByIdAndUpdate returns 11001 instead of 11000...?!?
+                if err?.lastErrorObject?.code is 11001
+                    # Increment slug and try to save again
+                    # FIXME: This is pretty inefficient
+                    update.slug = incrementSlug update.slug
+                    return Recipe.findByIdAndUpdate data.id, update, updateHandler
+
                 if err then return res.send(500, err.toString())
 
                 # Create user action
@@ -328,7 +352,9 @@ recipeController.update = (req, res) ->
 
                 action.save()
 
-                res.json recipeController.serialize(saved, data.detail)
+                res.json recipeController.serialize(saved, req.user, data.detail)
+
+            Recipe.findByIdAndUpdate data.id, update, updateHandler
 
 recipeController.delete = (req, res) ->
     params = util.extend {}, req.params

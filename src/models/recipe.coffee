@@ -36,4 +36,7 @@ RecipeSchema = new mongoose.Schema
     data:
         type: mongoose.Schema.Types.Mixed
 
+# Make user+slug unique
+RecipeSchema.index {user: 1, slug: 1}, {unique: true}
+
 module.exports = mongoose.model 'Recipe', RecipeSchema

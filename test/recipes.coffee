@@ -6,6 +6,8 @@ util = require '../lib/util'
 
 {app} = require '../lib/server'
 
+Recipe = require '../lib/models/recipe'
+
 authInfo = {}
 recipeId = null
 
@@ -22,7 +24,9 @@ describe '/v1/recipes', ->
                 done()
 
     after (done) ->
-        db.close done
+        Recipe.find().remove (err) ->
+            if err then done(err)
+            db.close done
 
     describe 'Create recipes', ->
         it 'Should successfully create a new recipe', (done) ->
@@ -35,6 +39,24 @@ describe '/v1/recipes', ->
                     if err then return done(err)
 
                     recipeId = res.body.id
+
+                    assert.ok res.body.slug
+                    assert.ok res.body.user.name
+
+                    done()
+
+        it 'Should successfully clone a recipe with a unique slug', (done) ->
+            request(app)
+                .post('/v1/recipes')
+                .send(private: false, recipe: {name: 'Test recipe', fermentables: [{name: 'Pale malt', weight: 3.2}]})
+                .set('Authorization', "Bearer #{authInfo.auth.token}")
+                .expect(200)
+                .end (err, res) ->
+                    console.log JSON.stringify(err)
+                    console.log require('util').inspect(res)
+                    if err then return done(err)
+
+                    assert.equal 'test-recipe-1', res.body.slug
 
                     done()
 
@@ -76,12 +98,13 @@ describe '/v1/recipes', ->
         it 'Should update a recipe successfully', (done) ->
             request(app)
                 .put("/v1/recipes/#{recipeId}")
-                .send(recipe: {name: 'Test recipe updated', fermentables: [{name: 'Pale malt', weight: 3.4}]})
+                .send(recipe: {name: 'Test Recipe', fermentables: [{name: 'Pale malt', weight: 3.4}]})
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect(200)
                 .end (err, res) ->
                     if err then return done(err)
 
+                    assert.equal 'test-recipe', res.body.slug
                     assert.equal 3.4, res.body.data.fermentables[0].weight
 
                     done()
