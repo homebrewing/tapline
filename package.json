@@ -1,6 +1,6 @@
 {
   "name": "tapline",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A homebrew beer recipe API server backed by MongoDB",
   "homepage": "https://github.com/homebrewing/tapline",
   "main": "lib/main.js",
@@ -63,8 +63,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "brauhaus": ">=0.8.2 <1",
-    "brauhaus-beerxml": "~0.5.4",
+    "brauhaus": "~1.0.0",
+    "brauhaus-beerxml": "~1.0.0",
     "mongoose": "3.6.x",
     "express": "~3.4",
     "json-gate": "~0.8.21",
@@ -83,7 +83,7 @@
     "passport-google-oauth": "~0.1.5",
     "slug": "~0.3.3",
     "connect-mongo": "~0.3.3",
-    "brauhaus-diff": "~0.2"
+    "brauhaus-diff": "~1.0.0"
   },
   "optionalDependencies": {
     "bcrypt": "~0.7.6"

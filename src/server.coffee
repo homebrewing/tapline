@@ -179,8 +179,8 @@ app.post '/account', ensureLogin, accountController.updateAccount
 app.get '/account/authorize', ensureLogin, oauthController.getAuthorization
 app.post '/account/authorize', ensureLogin, oauthController.postAuthorization
 
-app.get '/auth/facebook', passport.authenticate('facebook', scope: 'email')
-app.get '/auth/facebook/callback', loginController.login('facebook')
+app.get '/account/authorize/facebook', passport.authenticate('facebook', scope: 'email')
+app.get '/account/authorize/facebook/callback', loginController.login('facebook')
 
 app.get '/account/authorize/google', passport.authenticate('google', scope: 'openid email profile')
 app.get '/account/authorize/google/callback', loginController.login('google')
