@@ -13,7 +13,7 @@ class RecipeUpdatedWorker
                 log.debug "Action #{action.id}"
                 action.data = payload.info
                 action.save (err) ->
-                    if err then console.log(err)
+                    if err then log.error(err)
 
         # Create user action
         action = new Action
@@ -23,7 +23,8 @@ class RecipeUpdatedWorker
             private: payload.private
             data: payload.info
 
-        action.save()
+        action.save (err) ->
+            if err then log.error(err)
 
         done 'success'
 

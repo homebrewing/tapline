@@ -10,6 +10,8 @@ util = require '../lib/util'
 
 Recipe = require '../lib/models/recipe'
 
+RecipeUpdatedWorker = require '../lib/workers/recipe-updated'
+
 authInfo = {}
 recipeId = null
 
@@ -98,6 +100,8 @@ describe '/v1/recipes', ->
 
     describe 'Update recipes', ->
         it 'Should update a recipe successfully', (done) ->
+            queue.put.reset()
+
             request(app)
                 .put("/v1/recipes/#{recipeId}")
                 .send(recipe: {name: 'Test Recipe', fermentables: [{name: 'Pale malt', weight: 3.4}]})
@@ -109,7 +113,31 @@ describe '/v1/recipes', ->
                     assert.equal 'test-recipe', res.body.slug
                     assert.equal 3.4, res.body.data.fermentables[0].weight
 
+                    assert.ok queue.put.calledOnce
+
                     done()
+
+        it 'Should create/update actions in a background job', (done) ->
+            worker = RecipeUpdatedWorker()
+
+            workerData =
+                id: recipeId
+                user: authInfo.user.id
+                private: false
+                info:
+                    name: 'Test Recipe'
+                    slug: 'test-recipe'
+                    description: '...'
+                    og: 1.050
+                    fg: 1.009
+                    ibu: 23
+                    abv: 5.4
+                    color: 8
+
+            worker.work workerData, (status) ->
+                assert.equal 'success', status
+
+                done()
 
     describe 'Delete recipes', ->
         it 'Should delete a recipe successfully', (done) ->
