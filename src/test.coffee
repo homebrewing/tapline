@@ -44,6 +44,7 @@ ensureClient = (user, done) ->
             client = new Client
                 userId: user.id
                 name: 'Auth Test'
+                redirectUri: ['foo']
 
             client.save (err, client) ->
                 if err then return done(err)

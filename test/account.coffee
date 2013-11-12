@@ -61,7 +61,7 @@ describe '/account', ->
                 .expect('Content-Type', /html/)
                 .expect 200, done
 
-        it 'Should return a grant code and state to redirectUri', (done) ->
+        it 'Should return a grant code and state to redirectUri: web_server', (done) ->
             request(app)
                 .post('/account/authorize')
                 .send(clientId: authInfo.client.id, scopes: 'user,recipe', state: 'test', redirectUri: 'foo', type: 'web_server')
@@ -78,6 +78,35 @@ describe '/account', ->
                     if not grant then return done('Grant could not be extracted')
 
                     done()
+
+        it 'Should return a grant code to redirectUri: token', (done) ->
+            request(app)
+                .post('/account/authorize')
+                .send(clientId: authInfo.client.id, scopes: 'user,recipe', state: 'test', redirectUri: 'foo', type: 'token')
+                .set('Cookie', cookie)
+                .expect(302)
+                .expect('Location', /foo/)
+                .expect('Location', /access_token/)
+                .expect('Location', /authTest/)
+                .end (err, res) ->
+                    if res
+                        assert !err, "#{res.status}: #{res.text}"
+
+                    done err
+
+        it 'Should return 404 on bad client ID', (done) ->
+            request(app)
+                .post('/account/authorize')
+                .send(clientId: '00826cdc7aeb4816b2000000', scopes: 'user,recipe', state: 'test', redirectUri: 'foo', type: 'token')
+                .set('Cookie', cookie)
+                .expect 404, done
+
+        it 'Should return 400 on bad token request type', (done) ->
+            request(app)
+                .post('/account/authorize')
+                .send(clientId: authInfo.client.id, scopes: 'user,recipe', state: 'test', redirectUri: 'foo', type: 'bad')
+                .set('Cookie', cookie)
+                .expect 400, done
 
         it 'Should return an access token from a grant code', (done) ->
             request(app)

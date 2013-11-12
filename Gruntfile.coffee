@@ -18,6 +18,9 @@ module.exports = (grunt) ->
                 cmd: './bin/tapline.js'
                 options:
                     verbose: true
+        shell:
+            'drop-test-db':
+                command: 'mongo tapline_test --exec "db.dropDatabase()"'
         coffeelint:
             options:
                 indentation:
@@ -52,6 +55,7 @@ module.exports = (grunt) ->
             test:
                 options:
                     reporter: 'spec'
+                    grep: grunt.option('grep')
                 src: 'test-js/**/*.js'
             html:
                 options:
@@ -65,6 +69,7 @@ module.exports = (grunt) ->
                 src: 'test-js/**/*.js'
 
     grunt.loadNpmTasks 'grunt-external-daemon'
+    grunt.loadNpmTasks 'grunt-shell'
     grunt.loadNpmTasks 'grunt-coffeelint'
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-watch'
@@ -75,5 +80,6 @@ module.exports = (grunt) ->
     grunt.registerTask 'queue', ['external_daemon:beanstalkd']
     grunt.registerTask 'worker', ['external_daemon:tapline_worker']
     grunt.registerTask 'server', ['external_daemon:tapline']
-    grunt.registerTask 'test', ['compile', 'mochacov:test']
+    grunt.registerTask 'test', ['db', 'shell:drop-test-db', 'compile', 'mochacov:test']
+    grunt.registerTask 'coverage', ['db', 'shell:drop-test-db', 'compile', 'mochacov:html']
     grunt.registerTask 'default', ['db', 'queue', 'compile', 'server', 'worker', 'watch']
