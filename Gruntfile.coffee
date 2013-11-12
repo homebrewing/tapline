@@ -84,4 +84,5 @@ module.exports = (grunt) ->
     grunt.registerTask 'server', ['external_daemon:tapline']
     grunt.registerTask 'test', ['db', 'shell:drop-test-db', 'compile', 'mochacov:test']
     grunt.registerTask 'coverage', ['db', 'shell:drop-test-db', 'compile', 'mochacov:html']
+    grunt.registerTask 'coveralls', ['db', 'shell:drop-test-db', 'compile', 'mochacov:reportcoverage']
     grunt.registerTask 'default', ['db', 'queue', 'compile', 'server', 'worker', 'watch']
