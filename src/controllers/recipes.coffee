@@ -1,6 +1,7 @@
 _ = require 'lodash'
 brauhaus = require 'brauhaus'
 jsonGate = require 'json-gate'
+queue = require '../queue'
 slug = require 'slug'
 util = require '../util'
 
@@ -334,13 +335,12 @@ recipeController.update = (req, res) ->
 
                 if err then return res.send(500, err.toString())
 
-                # Create user action
-                action = new Action
-                    user: req.user._id
-                    type: 'recipe-updated'
-                    targetId: saved.id
+                # Update existing actions
+                workerData =
+                    id: saved.id
+                    user: req.user.id
                     private: saved.private
-                    data:
+                    info:
                         name: saved.name
                         slug: saved.slug
                         description: saved.data.description
@@ -350,7 +350,7 @@ recipeController.update = (req, res) ->
                         abv: saved.abv
                         color: saved.color
 
-                action.save()
+                queue.put 'recipe-updated', workerData
 
                 res.json recipeController.serialize(saved, req.user, data.detail)
 

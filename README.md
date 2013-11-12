@@ -36,6 +36,7 @@ Please ensure that you have the following installed / running:
 
  * [Node.js](http://nodejs.org/)
  * [MongoDB](http://www.mongodb.org/)
+ * [Beanstalkd](http://kr.github.io/beanstalkd/)
 
 Installation
 ------------
@@ -62,12 +63,18 @@ Contributing
 Contributions are welcome - just fork the project and submit a pull request when you are ready!
 
 ### Getting Started
-First, create a fork on GitHub. Then:
+First, create a fork on GitHub. Also, make sure you have Grunt. MongoDB and beanstalkd will be started for you, just make sure they are installed locally.
 
 ```bash
+# Install grunt if you don't already have it
+npm install -g grunt-cli
+
+# Setup tapline
 git clone ...
 cd tapline
 npm install
+...
+npm start
 ```
 
 ### Style Guide
@@ -93,10 +100,10 @@ New tests can be added in the `test` directory.
 You can generate a unit test code coverage report for unit tests using the following:
 
 ```bash
-cake coverage
+grunt mochacov:html
 ```
 
-You can find an HTML report in the `coverage` directory that is created. This report will show line-by-line code coverage information.
+You can find an HTML report in the `coverage.html` file. This report will show line-by-line code coverage information.
 
 ---
 

@@ -1,6 +1,8 @@
 assert = require 'assert'
 db = require '../lib/db'
+queue = require '../lib/queue'
 request = require 'supertest'
+sinon = require 'sinon'
 test = require '../lib/test'
 util = require '../lib/util'
 
@@ -13,6 +15,7 @@ recipeId = null
 
 describe '/v1/recipes', ->
     before (done) ->
+        sinon.stub queue, 'put'
         db.connect util.testDb, (err) ->
             if err then return done(err)
 
@@ -24,6 +27,7 @@ describe '/v1/recipes', ->
                 done()
 
     after (done) ->
+        queue.put.restore()
         Recipe.find().remove (err) ->
             if err then done(err)
             db.close done
@@ -52,8 +56,6 @@ describe '/v1/recipes', ->
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect(200)
                 .end (err, res) ->
-                    console.log JSON.stringify(err)
-                    console.log require('util').inspect(res)
                     if err then return done(err)
 
                     assert.equal 'test-recipe-1', res.body.slug

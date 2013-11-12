@@ -4,5 +4,7 @@ node_js:
     - 0.10
 services:
     - mongodb
+before_script:
+    - npm install -g grunt-cli
 after_script:
-    - ./node_modules/coffee-script/bin/cake updateCoverage
+    - grunt mochacov:reportcoverage

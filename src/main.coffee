@@ -48,7 +48,14 @@ if argv.dbUrl
     config.dbUrl = argv.dbUrl
 
 db = require './db'
+queue = require './queue'
 server = require './server'
 
 # Connect to the database and start the HTTP server
-db.connect config.dbUrl, (err) -> server.start config.listen
+db.connect config.dbUrl, (err) ->
+    if err then return console.log(err)
+
+    queue.connect '127.0.0.1', 11300, (err) ->
+        if err then return console.log(err)
+
+        server.start config.listen
