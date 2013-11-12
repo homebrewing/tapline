@@ -33,12 +33,16 @@ describe '/account', ->
 
     describe 'Require auth', ->
         it 'Should redirect to login for HTTP GET', (done) ->
+            @timeout 10000
+
             request(app)
                 .get('/account')
                 .expect(302)
                 .expect 'Location', /\/account\/login/, done
 
         it 'Should 403 for HTTP POST', (done) ->
+            @timeout 5000
+
             request(app)
                 .post('/account')
                 .expect 403, done

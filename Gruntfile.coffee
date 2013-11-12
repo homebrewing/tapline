@@ -19,6 +19,8 @@ module.exports = (grunt) ->
                 options:
                     verbose: true
         shell:
+            'dbdir':
+                command: 'mkdir -p db'
             'drop-test-db':
                 command: 'mongo tapline_test --exec "db.dropDatabase()"'
         coffeelint:
@@ -76,7 +78,7 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-mocha-cov'
 
     grunt.registerTask 'compile', ['coffeelint', 'coffee']
-    grunt.registerTask 'db', ['external_daemon:mongodb']
+    grunt.registerTask 'db', ['shell:dbdir', 'external_daemon:mongodb']
     grunt.registerTask 'queue', ['external_daemon:beanstalkd']
     grunt.registerTask 'worker', ['external_daemon:tapline_worker']
     grunt.registerTask 'server', ['external_daemon:tapline']
