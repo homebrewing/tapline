@@ -31,6 +31,18 @@ describe '/account', ->
     after (done) ->
         db.close done
 
+    describe 'Require auth', ->
+        it 'Should redirect to login for HTTP GET', (done) ->
+            request(app)
+                .get('/account')
+                .expect(302)
+                .expect 'Location', /\/account\/login/, done
+
+        it 'Should 403 for HTTP POST', (done) ->
+            request(app)
+                .post('/account')
+                .expect 403, done
+
     describe 'Login', ->
         it 'Should return HTML on success', (done) ->
             @timeout 5000
