@@ -185,6 +185,9 @@ app.get '/account/authorize/facebook/callback', loginController.login('facebook'
 app.get '/account/authorize/google', passport.authenticate('google', scope: 'openid email profile')
 app.get '/account/authorize/google/callback', loginController.login('google')
 
+app.get '/', (req, res) ->
+    res.status(200).sendfile 'public/apidoc.html'
+
 # Start the server
 exports.start = (listen, done) ->
     [host, port] = listen.split ':'

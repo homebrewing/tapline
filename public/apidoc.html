@@ -1,0 +1,846 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"><link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.2/css/font-awesome.min.css"><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway Dots"><style>/* Highlight.js Theme */
+.tomorrow-comment,pre .comment,pre .title{color:#8e908c}.tomorrow-red,pre .attribute,pre .css .class,pre .css .id,pre .css .pseudo,pre .html .doctype,pre .regexp,pre .ruby .constant,pre .tag,pre .variable,pre .xml .doctype,pre .xml .pi,pre .xml .tag .title{color:#c82829}.tomorrow-orange,pre .built_in,pre .constant,pre .literal,pre .number,pre .params,pre .preprocessor{color:#f5871f}.tomorrow-yellow,pre .class,pre .css .rules .attribute,pre .ruby .class .title{color:#eab700}.tomorrow-green,pre .header,pre .inheritance,pre .ruby .symbol,pre .string,pre .value,pre .xml .cdata{color:#718c00}.tomorrow-aqua,pre .css .hexcolor{color:#3e999f}.tomorrow-blue,pre .coffeescript .title,pre .function,pre .javascript .title,pre .perl .sub,pre .python .decorator,pre .python .title,pre .ruby .function .title,pre .ruby .title .keyword{color:#4271ae}.tomorrow-purple,pre .javascript .function,pre .keyword{color:#8959a8}pre code{display:block;background:#fff;color:#4d4d4c;font-family:Menlo,Monaco,Consolas,monospace;line-height:1.5;border:1px solid #ccc;padding:10px}</style><style type="text/css">body,
+h4,
+h5 {
+  font-family: 'Roboto' sans-serif !important;
+}
+h1,
+h2,
+h3,
+.aglio {
+  font-family: 'Raleway Dots' sans-serif !important;
+}
+code {
+  color: #444;
+  background-color: #ddd;
+  font-family: 'Inconsolata' monospace !important;
+}
+a[data-target] {
+  cursor: pointer;
+}
+h4 {
+  font-size: 100%;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.back-to-top {
+  position: fixed;
+  z-index: 1;
+  bottom: 0px;
+  right: 24px;
+  padding: 4px 8px;
+  background-color: #eee;
+  text-decoration: none !important;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  border-right: 1px solid rgba(0,0,0,0.1);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+.panel {
+  overflow: hidden;
+}
+.panel-heading code {
+  color: #c7254e;
+  background-color: transparent;
+}
+.panel-heading h3 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+a.list-group-item {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.list-group-item.collapse {
+  display: none;
+}
+</style></head><body><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a><div class="container"><div class="row"><nav style="margin-top: 38px;" class="col-md-3"><div class="list-group"><a href="#resource-group-anonymous-public api" class="list-group-item"><i class="fa fa-folder-open"></i>&nbsp;Anonymous Public API</a><a href="#resource-convert-duration" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-plus-square"></i>&nbsp;Convert Duration</a><a href="#resource-convert-color" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-plus-square"></i>&nbsp;Convert Color</a><a href="#resource-convert-recipe" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-plus-square"></i>&nbsp;Convert Recipe</a><a href="#resource-calculate-recipe" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-plus-square"></i>&nbsp;Calculate Recipe</a><a href="#resource-recipe-collection" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-arrow-circle-down"></i>&nbsp;Recipe Collection</a><a href="#resource-user-collection" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-arrow-circle-down"></i>&nbsp;User Collection</a><a href="#resource-register-new user" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-plus-square"></i>&nbsp;Register new user</a></div><div class="list-group"><a href="#resource-group-authentication" class="list-group-item"><i class="fa fa-folder-open"></i>&nbsp;Authentication</a></div><div class="list-group"><a href="#resource-group-recipes" class="list-group-item"><i class="fa fa-folder-open"></i>&nbsp;Recipes</a><a href="#resource-recipe-collection" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-list"></i>&nbsp;Recipe Collection</a><a href="#recipes-recipe-collection-get" style="padding-left: 48px" class="list-group-item"><i class="fa fa-arrow-circle-down"></i>&nbsp;Get recipes</a><a href="#recipes-recipe-collection-post" style="padding-left: 48px" class="list-group-item"><i class="fa fa-plus-square"></i>&nbsp;Create a new recipe</a><a href="#resource-recipe" style="padding-left: 32px;" class="list-group-item"><i class="fa fa-list"></i>&nbsp;Recipe</a><a href="#recipes-recipe-get" style="padding-left: 48px" class="list-group-item"><i class="fa fa-arrow-circle-down"></i>&nbsp;Get a recipe</a><a href="#recipes-recipe-put" style="padding-left: 48px" class="list-group-item"><i class="fa fa-pencil"></i>&nbsp;Update a recipe</a><a href="#recipes-recipe-delete" style="padding-left: 48px" class="list-group-item"><i class="fa fa-warning"></i>&nbsp;Delete a recipe</a></div><p style="text-align: center"><a href="https://api.malt.io">https://api.malt.io</a></p></nav><div class="col-md-9"><header><div class="page-header"><h1 id="top">Tapline API</h1></div></header><div class="description"><p>Tapline is the <a href="http://beta.malt.io/">Malt.io</a> API. It provides access to users, recipes, and conversion/calculation functions that any client can use if they can speak REST and JSON.</p>
+<h2 id="examples">Examples</h2>
+<ul>
+<li>TODO: jsfiddle examples of a few calls</li>
+</ul>
+</div><div class="panel panel-default"><div class="panel-heading"><h3 id="resource-group-anonymous-public api">Anonymous Public API</h3></div><div class="panel-body"><p>Public calls that do not require authentication.</p>
+<h4 id="resource-convert-duration">Convert Duration</h4><section id="anonymous-public api-convert-duration-post" class="panel panel-success"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Convert</span><span class="btn btn-xs btn-success">POST</span>&nbsp;<code>/v1/convert/duration</code></div><div class="panel-body"><p>Utilities to convert one or more representations of durations.</p>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>values</dt><dd><code>array</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>[1, 2]</span></span><p>List of durations to convert</p>
+</dd><dt>outputFormat</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>minutes</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>display</span></span><p>Output format</p>
+<p><strong>Choices:&nbsp;</strong><code>minutes</code>, <code>display</code></p></dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#17" class="pull-right">Toggle</a></li><li id="17" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">values</span>": <span class="value">[
+        <span class="number">5823</span>,
+        <span class="string">"1 day 23 hours 2min"</span>,
+        <span class="string">"60hrs"</span>
+    ]</span>,
+    "<span class="attribute">outputFormat</span>": <span class="value"><span class="string">"display"</span>
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#925334" class="pull-right">Toggle</a></li><li id="925334" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">format</span>": <span class="value"><span class="string">"display"</span></span>,
+    "<span class="attribute">values</span>": <span class="value">[
+        <span class="string">"4 days 1 hour 3 minutes"</span>, 
+        <span class="string">"1 day 23 hours 2 minutes"</span>, 
+        <span class="string">"2 days 12 hours"</span>
+    ]
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>400</code></strong><a data-toggle="collapse" data-target="#58733" class="pull-right">Toggle</a></li><li id="58733" class="list-group-item collapse"><h5>Body</h5><pre><code>Invalid output <span class="built_in">format</span> <span class="string">'foo'</span>!
+</code></pre></li></ul></section><h4 id="resource-convert-color">Convert Color</h4><section id="anonymous-public api-convert-color-post" class="panel panel-success"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Convert</span><span class="btn btn-xs btn-success">POST</span>&nbsp;<code>/v1/convert/color</code></div><div class="panel-body"><p>Utilities to convert one or more representations of colors.</p>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>format</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ebc</span></span><p>Input format</p>
+</dd><dt>values</dt><dd><code>array</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>[1, 2]</span></span><p>List of colors to convert</p>
+</dd><dt>outputFormat</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>ebc</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>srm</span></span><p>Output format</p>
+<p><strong>Choices:&nbsp;</strong><code>ebc</code>, <code>srm</code>, <code>lovibond</code>, <code>name</code>, <code>rgb</code>, <code>css</code></p></dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#753959" class="pull-right">Toggle</a></li><li id="753959" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">format</span>": <span class="value"><span class="string">"srm"</span></span>,
+    "<span class="attribute">values</span>": <span class="value">[
+        <span class="number">4</span>,
+        <span class="number">9</span>,
+        <span class="number">15</span>,
+        <span class="number">20</span>,
+        <span class="number">28</span>
+    ]
+    <span class="string">"outputFormat"</span>: <span class="string">"ebc"</span>
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#22676" class="pull-right">Toggle</a></li><li id="22676" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">format</span>": <span class="value"><span class="string">"ebc"</span></span>,
+    "<span class="attribute">values</span>": <span class="value">[
+        <span class="number">7.88</span>,
+        <span class="number">17.73</span>,
+        <span class="number">29.55</span>,
+        <span class="number">39.4</span>,
+        <span class="number">55.16</span>
+    ]
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>400</code></strong><a data-toggle="collapse" data-target="#496872" class="pull-right">Toggle</a></li><li id="496872" class="list-group-item collapse"><h5>Body</h5><pre><code>Invalid output <span class="built_in">format</span> <span class="string">'foo'</span>!
+</code></pre></li></ul></section><h4 id="resource-convert-recipe">Convert Recipe</h4><section id="anonymous-public api-convert-recipe-post" class="panel panel-success"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Convert</span><span class="btn btn-xs btn-success">POST</span>&nbsp;<code>/v1/convert/recipe</code></div><div class="panel-body"><p>Utilities to convert one or more representations of a serialized recipe.</p>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>format</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>beerxml</span></span><p>Input format</p>
+</dd><dt>recipes</dt><dd><code>array</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>['&lt;beerxml&gt;...&lt;/beerxml&gt;']</span></span><p>List of recipes to convert</p>
+</dd><dt>outputFormat</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>json</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>beerxml</span></span><p>Output format</p>
+<p><strong>Choices:&nbsp;</strong><code>json</code>, <code>beerxml</code></p></dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#97471" class="pull-right">Toggle</a></li><li id="97471" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "format": "beerxml",
+    "recipes": [
+        "<span class="tag">&lt;<span class="title">recipes</span>&gt;</span><span class="tag">&lt;<span class="title">recipe</span>&gt;</span><span class="tag">&lt;<span class="title">version</span>&gt;</span>1<span class="tag">&lt;/<span class="title">version</span>&gt;</span><span class="tag">&lt;<span class="title">name</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">name</span>&gt;</span><span class="tag">&lt;<span class="title">fermentables</span>&gt;</span><span class="tag">&lt;<span class="title">fermentable</span>&gt;</span><span class="tag">&lt;<span class="title">name</span>&gt;</span>Pale extract<span class="tag">&lt;/<span class="title">name</span>&gt;</span><span class="tag">&lt;<span class="title">amount</span>&gt;</span>3.5<span class="tag">&lt;/<span class="title">amount</span>&gt;</span><span class="tag">&lt;<span class="title">yield</span>&gt;</span>75<span class="tag">&lt;/<span class="title">yield</span>&gt;</span><span class="tag">&lt;/<span class="title">fermentable</span>&gt;</span><span class="tag">&lt;/<span class="title">fermentables</span>&gt;</span><span class="tag">&lt;/<span class="title">recipe</span>&gt;</span><span class="tag">&lt;/<span class="title">recipes</span>&gt;</span>"
+    ],
+    "outputFormat": "json"
+}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#150015" class="pull-right">Toggle</a></li><li id="150015" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">format</span>": <span class="value"><span class="string">"json"</span></span>, 
+    "<span class="attribute">recipes</span>": <span class="value">[
+        {
+            "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+            "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+            "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">description</span>": <span class="value"><span class="string">"Recipe description"</span></span>, 
+            "<span class="attribute">fermentables</span>": <span class="value">[
+                {
+                    "<span class="attribute">color</span>": <span class="value"><span class="number">2</span></span>, 
+                    "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Pale extract"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">3.5</span></span>, 
+                    "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+            "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"Test"</span></span>, 
+            "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+            "<span class="attribute">spices</span>": <span class="value">[]</span>, 
+            "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+            "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">yeast</span>": <span class="value">[]
+        </span>}
+    ]
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>400</code></strong><a data-toggle="collapse" data-target="#214200" class="pull-right">Toggle</a></li><li id="214200" class="list-group-item collapse"><h5>Body</h5><pre><code>Invalid output <span class="built_in">format</span> <span class="string">'foo'</span>!
+</code></pre></li></ul></section><h4 id="resource-calculate-recipe">Calculate Recipe</h4><section id="anonymous-public api-calculate-recipe-post" class="panel panel-success"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Calculate</span><span class="btn btn-xs btn-success">POST</span>&nbsp;<code>/v1/convert/recipe</code></div><div class="panel-body"><p>Utilities to convert one or more representations of a serialized recipe.</p>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>format</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>beerxml</span></span><p>Input format</p>
+<p><strong>Choices:&nbsp;</strong><code>json</code>, <code>beerxml</code></p></dd><dt>recipes</dt><dd><code>array</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>['&lt;beerxml&gt;...&lt;/beerxml&gt;']</span></span><p>List of recipes to convert</p>
+</dd><dt>siUnits</dt><dd><code>boolean</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>true</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>false</span></span><p>True to use kg, liters and &deg;C instead of lb, oz, gallons, and &deg;F</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#404358" class="pull-right">Toggle</a></li><li id="404358" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "format": "beerxml",
+    "recipes": [
+        "<span class="tag">&lt;<span class="title">recipes</span>&gt;</span><span class="tag">&lt;<span class="title">recipe</span>&gt;</span><span class="tag">&lt;<span class="title">version</span>&gt;</span>1<span class="tag">&lt;/<span class="title">version</span>&gt;</span><span class="tag">&lt;<span class="title">name</span>&gt;</span>Test<span class="tag">&lt;/<span class="title">name</span>&gt;</span><span class="tag">&lt;<span class="title">fermentables</span>&gt;</span><span class="tag">&lt;<span class="title">fermentable</span>&gt;</span><span class="tag">&lt;<span class="title">name</span>&gt;</span>Pale extract<span class="tag">&lt;/<span class="title">name</span>&gt;</span><span class="tag">&lt;<span class="title">amount</span>&gt;</span>3.5<span class="tag">&lt;/<span class="title">amount</span>&gt;</span><span class="tag">&lt;<span class="title">yield</span>&gt;</span>75<span class="tag">&lt;/<span class="title">yield</span>&gt;</span><span class="tag">&lt;/<span class="title">fermentable</span>&gt;</span><span class="tag">&lt;/<span class="title">fermentables</span>&gt;</span><span class="tag">&lt;/<span class="title">recipe</span>&gt;</span><span class="tag">&lt;/<span class="title">recipes</span>&gt;</span>"
+    ],
+    "siUnits": true
+}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#596227" class="pull-right">Toggle</a></li><li id="596227" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="attribute">abv</span>": <span class="value"><span class="number">4.982895960844915</span></span>, 
+        "<span class="attribute">abw</span>": <span class="value"><span class="number">3.8872943605883177</span></span>, 
+        "<span class="attribute">buToGu</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">bv</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">calories</span>": <span class="value"><span class="number">165.65117039861516</span></span>, 
+        "<span class="attribute">color</span>": <span class="value"><span class="number">3.1126033196646703</span></span>, 
+        "<span class="attribute">fg</span>": <span class="value"><span class="number">1.0126549326899237</span></span>, 
+        "<span class="attribute">fgPlato</span>": <span class="value"><span class="number">3.2323394802073437</span></span>, 
+        "<span class="attribute">grainWeight</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">ibu</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">og</span>": <span class="value"><span class="number">1.0506197307596945</span></span>, 
+        "<span class="attribute">ogPlato</span>": <span class="value"><span class="number">12.534722891468903</span></span>, 
+        "<span class="attribute">price</span>": <span class="value"><span class="number">15.400000000000002</span></span>, 
+        "<span class="attribute">realExtract</span>": <span class="value"><span class="number">4.914210400963434</span></span>, 
+        "<span class="attribute">timeline</span>": <span class="value">[
+            [
+                <span class="number">0</span>, 
+                <span class="string">"Bring 10.0l to a rolling boil (about 21 minutes)."</span>
+            ], 
+            [
+                <span class="number">21</span>, 
+                <span class="string">"Flame out. Begin chilling to 20°C and aerate the cooled wort (about 20 minutes)."</span>
+            ], 
+            [
+                <span class="number">41</span>, 
+                <span class="string">"Pitch yeast and seal the fermenter. You should see bubbles in the airlock within 24 hours."</span>
+            ], 
+            [
+                <span class="number">20201</span>, 
+                <span class="string">"Prime and bottle about 56 bottles. Age at 20C for 14 days."</span>
+            ], 
+            [
+                <span class="number">40361</span>, 
+                <span class="string">"Relax, don't worry and have a homebrew!"</span>
+            ]
+        ]
+    </span>}
+]
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>400</code></strong><a data-toggle="collapse" data-target="#166842" class="pull-right">Toggle</a></li><li id="166842" class="list-group-item collapse"><h5>Body</h5><pre><code>Invalid input <span class="built_in">format</span> <span class="string">'foo'</span>!
+</code></pre></li></ul></section><h4 id="resource-recipe-collection">Recipe Collection</h4><p>A collection of recipes.</p>
+<section id="anonymous-public api-recipe-collection-get" class="panel panel-info"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Get recipes</span><span class="btn btn-xs btn-primary">GET</span>&nbsp;<code>/v1/public/recipes{?ids,userIds,slugs,offset,limit,sort,detail}</code></div><div class="panel-body"><p>Gets a list of recipes given the input parameters for filtering and sorting. An example call would look like this:</p>
+<pre><code class="lang-no-highlight">https://api.malt.io/v1/public/recipes?detail=true</code></pre>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>ids</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>100,102,105</span></span><p>List of recipe IDs</p>
+</dd><dt>userIds</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>200,201,204</span></span><p>List of recipe owner user IDs</p>
+</dd><dt>slugs</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>test-recipe,hefeweizen</span></span><p>List of recipe slugs to find in conjunction with <code>userIds</code></p>
+</dd><dt>offset</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>0</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>0</span></span><p>Number of recipes to skip</p>
+</dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>20</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>30</span></span><p>Number of recipes returned</p>
+</dd><dt>sort</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>-created</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>name</span></span><p>Sort method</p>
+<p><strong>Choices:&nbsp;</strong><code>created</code>, <code>-created</code>, <code>name</code>, <code>-name</code></p></dd><dt>detail</dt><dd><code>boolean</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>false</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>true</span></span><p>Whether to show detailed info</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#408028" class="pull-right">Toggle</a></li><li id="408028" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json; charset=utf-8</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-11-02T17:25:51.275Z"</span></span>, 
+        "<span class="attribute">data</span>": <span class="value">{
+            "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">agingTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+            "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">batchSizeGallons</span>": <span class="value"><span class="number">5.283440000000001</span></span>, 
+            "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+            "<span class="attribute">boilSizeGallons</span>": <span class="value"><span class="number">2.6417200000000003</span></span>, 
+            "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">2.5</span></span>, 
+            "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">23</span></span>, 
+            "<span class="attribute">bottlingTempF</span>": <span class="value"><span class="number">73.4</span></span>, 
+            "<span class="attribute">description</span>": <span class="value"><span class="string">"Just a basic beer example for testing. foo this is a long description"</span></span>, 
+            "<span class="attribute">fermentables</span>": <span class="value">[
+                {
+                    "<span class="attribute">color</span>": <span class="value"><span class="number">6.096</span></span>, 
+                    "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Extra pale extract"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+            "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"Another Beer 2"</span></span>, 
+            "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">primaryTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+            "<span class="attribute">servingSizeOz</span>": <span class="value"><span class="number">0.09378106</span></span>, 
+            "<span class="attribute">spices</span>": <span class="value">[
+                {
+                    "<span class="attribute">aa</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"pellet"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Cascade hops"</span></span>, 
+                    "<span class="attribute">time</span>": <span class="value"><span class="number">60</span></span>, 
+                    "<span class="attribute">use</span>": <span class="value"><span class="string">"boil"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">0.028349556839727483</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+            "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">yeast</span>": <span class="value">[
+                {
+                    "<span class="attribute">attenuation</span>": <span class="value"><span class="number">74</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"liquid"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Wyeast 3052"</span></span>, 
+                    "<span class="attribute">type</span>": <span class="value"><span class="string">"ale"</span>
+                </span>}
+            ]
+        </span>}</span>, 
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"5275359f031555931a000005"</span></span>, 
+        "<span class="attribute">private</span>": <span class="value"><span class="literal">false</span></span>, 
+        "<span class="attribute">slug</span>": <span class="value"><span class="string">"another-beer-2"</span></span>, 
+        "<span class="attribute">user</span>": <span class="value">{
+            "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+            "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span>
+        </span>}
+    </span>}, 
+    {
+        "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-10-24T20:39:23.320Z"</span></span>, 
+        "<span class="attribute">data</span>": <span class="value">{
+            "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">agingTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+            "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">batchSizeGallons</span>": <span class="value"><span class="number">5.283440000000001</span></span>, 
+            "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+            "<span class="attribute">boilSizeGallons</span>": <span class="value"><span class="number">2.6417200000000003</span></span>, 
+            "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">2.5</span></span>, 
+            "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">23</span></span>, 
+            "<span class="attribute">bottlingTempF</span>": <span class="value"><span class="number">73.4</span></span>, 
+            "<span class="attribute">description</span>": <span class="value"><span class="string">"Just a basic beer example for testing. foo this is a long description"</span></span>, 
+            "<span class="attribute">fermentables</span>": <span class="value">[
+                {
+                    "<span class="attribute">color</span>": <span class="value"><span class="number">1.27</span></span>, 
+                    "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Extra pale extract"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+            "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"Hefeweizen"</span></span>, 
+            "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">primaryTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+            "<span class="attribute">servingSizeOz</span>": <span class="value"><span class="number">0.09378106</span></span>, 
+            "<span class="attribute">spices</span>": <span class="value">[
+                {
+                    "<span class="attribute">aa</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"pellet"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Cascade hops"</span></span>, 
+                    "<span class="attribute">time</span>": <span class="value"><span class="number">60</span></span>, 
+                    "<span class="attribute">use</span>": <span class="value"><span class="string">"boil"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">0.028349556839727483</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+            "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">yeast</span>": <span class="value">[
+                {
+                    "<span class="attribute">attenuation</span>": <span class="value"><span class="number">74</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"liquid"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Wyeast 3052"</span></span>, 
+                    "<span class="attribute">type</span>": <span class="value"><span class="string">"ale"</span>
+                </span>}
+            ]
+        </span>}</span>, 
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"5269857b7011ba8186000001"</span></span>, 
+        "<span class="attribute">private</span>": <span class="value"><span class="literal">false</span></span>, 
+        "<span class="attribute">slug</span>": <span class="value"><span class="string">"hefeweizen"</span></span>, 
+        "<span class="attribute">user</span>": <span class="value">{
+            "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+            "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span>
+        </span>}
+    </span>}
+]
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>400</code></strong><a data-toggle="collapse" data-target="#267562" class="pull-right">Toggle</a></li><li id="267562" class="list-group-item collapse"><h5>Body</h5><pre><code>Invalid sort <span class="built_in">option</span>
+</code></pre></li></ul></section><h4 id="resource-user-collection">User Collection</h4><p>A collection of users.</p>
+<section id="anonymous-public api-user-collection-get" class="panel panel-info"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Get users</span><span class="btn btn-xs btn-primary">GET</span>&nbsp;<code>/v1/public/users{?ids,names,offset,limit,sort,fromLong,fromLat}</code></div><div class="panel-body"><p>Gets a list of users given the input parameters for filtering and sroting. An example call would look like this:</p>
+<pre><code class="lang-no-highlight">https://api.malt.io/v1/public/users?limit=5</code></pre>
+</div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>ids</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>101,102</span></span><p>List of user IDs</p>
+</dd><dt>names</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>daniel,kari</span></span><p>List of usernames</p>
+</dd><dt>offset</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>0</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>0</span></span><p>Number of recipes to skip</p>
+</dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>20</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>30</span></span><p>Number of recipes returned</p>
+</dd><dt>sort</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>name</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>-created</span></span><p>Sort method</p>
+<p><strong>Choices:&nbsp;</strong><code>created</code>, <code>-created</code>, <code>name</code>, <code>-name</code>, <code>recipeCount</code>, <code>-recipeCount</code>, <code>location</code></p></dd><dt>fromLong</dt><dd><code>number</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>-122.3</span></span><p>Longitude to find nearby users when <code>sort</code> is <code>location</code></p>
+</dd><dt>fromLat</dt><dd><code>number</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>47.6</span></span><p>Latitude to find nearby users when <code>sort</code> is <code>location</code></p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#924770" class="pull-right">Toggle</a></li><li id="924770" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json; charset=utf-8</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="attribute">confirmed</span>": <span class="value"><span class="literal">true</span></span>, 
+        "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-07-11T06:43:31.988Z"</span></span>, 
+        "<span class="attribute">following</span>": <span class="value">[]</span>, 
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+        "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+        "<span class="attribute">location</span>": <span class="value">[
+            -<span class="number">122.331</span>, 
+            <span class="number">47.61</span>
+        ]</span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span></span>, 
+        "<span class="attribute">recipeCount</span>": <span class="value"><span class="number">0</span>
+    </span>}, 
+    {
+        "<span class="attribute">confirmed</span>": <span class="value"><span class="literal">false</span></span>, 
+        "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-08-01T00:54:44.656Z"</span></span>, 
+        "<span class="attribute">following</span>": <span class="value">[]</span>, 
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"51f9b1d45946118c34000001"</span></span>, 
+        "<span class="attribute">image</span>": <span class="value"><span class="string">"https://plus.google.com/s2/photos/profile/117442582930902051362?sz=SIZE"</span></span>, 
+        "<span class="attribute">location</span>": <span class="value">[
+            -<span class="number">122.331</span>, 
+            <span class="number">47.61</span>
+        ]</span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel-taylor"</span></span>, 
+        "<span class="attribute">recipeCount</span>": <span class="value"><span class="number">0</span>
+    </span>}
+]
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>400</code></strong><a data-toggle="collapse" data-target="#677424" class="pull-right">Toggle</a></li><li id="677424" class="list-group-item collapse"><h5>Body</h5><pre><code>Invalid sort <span class="built_in">option</span>
+</code></pre></li></ul></section><h4 id="resource-register-new user">Register new user</h4><p>Registers a new user account with a username and password. This user will not be able to use social authentication to log in.</p>
+<section id="anonymous-public api-register-new user-post" class="panel panel-success"><div class="panel-heading"><span class="btn btn-xs btn-success">POST</span>&nbsp;<code>/v1/users</code></div><div class="panel-body"></div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#724585" class="pull-right">Toggle</a></li><li id="724585" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">email</span>": <span class="value"><span class="string">"foo@bar.com"</span></span>,
+    "<span class="attribute">name</span>": <span class="value"><span class="string">"username"</span></span>,
+    "<span class="attribute">image</span>": <span class="value"><span class="string">"http://foo.com/bar.jpg?size=SIZE"</span></span>,
+    "<span class="attribute">location</span>": <span class="value">[-<span class="number">122.331</span>, <span class="number">47.61</span>]
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#872747" class="pull-right">Toggle</a></li><li id="872747" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">confirmed</span>": <span class="value"><span class="literal">false</span></span>, 
+    "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-11-01T00:54:44.656Z"</span></span>, 
+    "<span class="attribute">following</span>": <span class="value">[]</span>, 
+    "<span class="attribute">id</span>": <span class="value"><span class="string">"51f9b1d45946118c34000001"</span></span>, 
+    "<span class="attribute">image</span>": <span class="value"><span class="string">"http://foo.com/bar.jpg?size=SIZE"</span></span>, 
+    "<span class="attribute">location</span>": <span class="value">[
+        -<span class="number">122.331</span>, 
+        <span class="number">47.61</span>
+    ]</span>, 
+    "<span class="attribute">name</span>": <span class="value"><span class="string">"username"</span></span>, 
+    "<span class="attribute">recipeCount</span>": <span class="value"><span class="number">0</span>
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>400</code></strong><a data-toggle="collapse" data-target="#991429" class="pull-right">Toggle</a></li><li id="991429" class="list-group-item collapse"><h5>Body</h5><pre><code><span class="title">Invalid</span> username!
+</code></pre></li></ul></section></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="resource-group-authentication">Authentication</h3></div><div class="panel-body"><p>The API is split into two parts: the public API and the authenticated API. The public API requires no authentication and will list public information about users and recipes as well as providing converters and calculators.</p>
+<p>The authenticated API, on the other hand, <strong>requires</strong> an OAuth bearer token in an HTTP authorization header. For example:</p>
+<pre><code class="lang-http"><span class="attribute">Authorization</span>: <span class="string">bearer 5262d64b892e8d4341000001</span></code></pre>
+<p>In order to get an authorization token, you must first register an application. Then, using your application token you request access on behalf of a user and are given an OAuth bearer token to use for subsequent requests.</p>
+<h2 id="registering-an-application">Registering an application</h2>
+<p>TODO</p>
+<h2 id="getting-an-oauth-token">Getting an OAuth token</h2>
+<p>To get an OAuth token for a user, you use a special URL. For example:</p>
+<pre><code class="lang-no-highlight">https://api.malt.io/account/authorize?response_type=code&amp;redirect_uri={website}&amp;scope=user,recipe&amp;client_id={client}&amp;type=token</code></pre>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>website</td>
+<td>URL to your website’s handler</td>
+<td><a href="http://beta.malt.io/auth/callback">http://beta.malt.io/auth/callback</a></td>
+</tr>
+<tr>
+<td>client</td>
+<td>Your application token</td>
+<td>51de552db0848b204b554089</td>
+</tr>
+</tbody>
+</table>
+<p>If the user authorizes your application then the user is redirected to the <code>website</code> URL above, which the token in a hash value:</p>
+<pre><code class="lang-no-highlight">http://your-website.com/auth/callback#access_token:5262d64b892e8d4341000001</code></pre>
+<p>Save this token and you can use it for all subsequent requests that require auth.</p>
+</div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="resource-group-recipes">Recipes</h3></div><div class="panel-body"><p>Authenticated calls to get, modify and delete recipes.</p>
+<h4 id="resource-recipe-collection">Recipe Collection</h4><p>A collection of recipes.</p>
+<section id="recipes-recipe-collection-get" class="panel panel-info"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Get recipes</span><span class="btn btn-xs btn-primary">GET</span>&nbsp;<code>/v1/recipes</code></div><div class="panel-body"></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>ids</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>100,102,105</span></span><p>List of recipe IDs</p>
+</dd><dt>userIds</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>200,201,204</span></span><p>List of recipe owner user IDs</p>
+</dd><dt>slugs</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>test-recipe,hefeweizen</span></span><p>List of recipe slugs to find in conjunction with <code>userIds</code></p>
+</dd><dt>offset</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>0</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>0</span></span><p>Number of recipes to skip</p>
+</dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>20</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>30</span></span><p>Number of recipes returned</p>
+</dd><dt>sort</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>-created</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>name</span></span><p>Sort method</p>
+<p><strong>Choices:&nbsp;</strong><code>created</code>, <code>-created</code>, <code>name</code>, <code>-name</code></p></dd><dt>detail</dt><dd><code>boolean</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>false</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>true</span></span><p>Whether to show detailed info</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#748759" class="pull-right">Toggle</a></li><li id="748759" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json; charset=utf-8</span><br></code></pre><h5>Body</h5><pre><code>[
+    {
+        "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-11-02T17:25:51.275Z"</span></span>, 
+        "<span class="attribute">data</span>": <span class="value">{
+            "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">agingTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+            "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">batchSizeGallons</span>": <span class="value"><span class="number">5.283440000000001</span></span>, 
+            "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+            "<span class="attribute">boilSizeGallons</span>": <span class="value"><span class="number">2.6417200000000003</span></span>, 
+            "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">2.5</span></span>, 
+            "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">23</span></span>, 
+            "<span class="attribute">bottlingTempF</span>": <span class="value"><span class="number">73.4</span></span>, 
+            "<span class="attribute">description</span>": <span class="value"><span class="string">"Just a basic beer example for testing. foo this is a long description"</span></span>, 
+            "<span class="attribute">fermentables</span>": <span class="value">[
+                {
+                    "<span class="attribute">color</span>": <span class="value"><span class="number">6.096</span></span>, 
+                    "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Extra pale extract"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+            "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"Another Beer 2"</span></span>, 
+            "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">primaryTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+            "<span class="attribute">servingSizeOz</span>": <span class="value"><span class="number">0.09378106</span></span>, 
+            "<span class="attribute">spices</span>": <span class="value">[
+                {
+                    "<span class="attribute">aa</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"pellet"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Cascade hops"</span></span>, 
+                    "<span class="attribute">time</span>": <span class="value"><span class="number">60</span></span>, 
+                    "<span class="attribute">use</span>": <span class="value"><span class="string">"boil"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">0.028349556839727483</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+            "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">yeast</span>": <span class="value">[
+                {
+                    "<span class="attribute">attenuation</span>": <span class="value"><span class="number">74</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"liquid"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Wyeast 3052"</span></span>, 
+                    "<span class="attribute">type</span>": <span class="value"><span class="string">"ale"</span>
+                </span>}
+            ]
+        </span>}</span>, 
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"5275359f031555931a000005"</span></span>, 
+        "<span class="attribute">private</span>": <span class="value"><span class="literal">false</span></span>, 
+        "<span class="attribute">slug</span>": <span class="value"><span class="string">"another-beer-2"</span></span>, 
+        "<span class="attribute">user</span>": <span class="value">{
+            "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+            "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span>
+        </span>}
+    </span>}, 
+    {
+        "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-10-24T20:39:23.320Z"</span></span>, 
+        "<span class="attribute">data</span>": <span class="value">{
+            "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">agingTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+            "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">batchSizeGallons</span>": <span class="value"><span class="number">5.283440000000001</span></span>, 
+            "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+            "<span class="attribute">boilSizeGallons</span>": <span class="value"><span class="number">2.6417200000000003</span></span>, 
+            "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">2.5</span></span>, 
+            "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">23</span></span>, 
+            "<span class="attribute">bottlingTempF</span>": <span class="value"><span class="number">73.4</span></span>, 
+            "<span class="attribute">description</span>": <span class="value"><span class="string">"Just a basic beer example for testing. foo this is a long description"</span></span>, 
+            "<span class="attribute">fermentables</span>": <span class="value">[
+                {
+                    "<span class="attribute">color</span>": <span class="value"><span class="number">1.27</span></span>, 
+                    "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Extra pale extract"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+            "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"Hefeweizen"</span></span>, 
+            "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+            "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">primaryTempF</span>": <span class="value"><span class="number">68</span></span>, 
+            "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">secondaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+            "<span class="attribute">servingSizeOz</span>": <span class="value"><span class="number">0.09378106</span></span>, 
+            "<span class="attribute">spices</span>": <span class="value">[
+                {
+                    "<span class="attribute">aa</span>": <span class="value"><span class="number">4.5</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"pellet"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Cascade hops"</span></span>, 
+                    "<span class="attribute">time</span>": <span class="value"><span class="number">60</span></span>, 
+                    "<span class="attribute">use</span>": <span class="value"><span class="string">"boil"</span></span>, 
+                    "<span class="attribute">weight</span>": <span class="value"><span class="number">0.028349556839727483</span>
+                </span>}
+            ]</span>, 
+            "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+            "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+            "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+            "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+            "<span class="attribute">tertiaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+            "<span class="attribute">yeast</span>": <span class="value">[
+                {
+                    "<span class="attribute">attenuation</span>": <span class="value"><span class="number">74</span></span>, 
+                    "<span class="attribute">form</span>": <span class="value"><span class="string">"liquid"</span></span>, 
+                    "<span class="attribute">name</span>": <span class="value"><span class="string">"Wyeast 3052"</span></span>, 
+                    "<span class="attribute">type</span>": <span class="value"><span class="string">"ale"</span>
+                </span>}
+            ]
+        </span>}</span>, 
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"5269857b7011ba8186000001"</span></span>, 
+        "<span class="attribute">private</span>": <span class="value"><span class="literal">false</span></span>, 
+        "<span class="attribute">slug</span>": <span class="value"><span class="string">"hefeweizen"</span></span>, 
+        "<span class="attribute">user</span>": <span class="value">{
+            "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+            "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+            "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span>
+        </span>}
+    </span>}
+]
+</code></pre></li></ul></section><section id="recipes-recipe-collection-post" class="panel panel-success"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Create a new recipe</span><span class="btn btn-xs btn-success">POST</span>&nbsp;<code>/v1/recipes</code></div><div class="panel-body"></div><ul class="list-group"><li class="list-group-item bg-default"><strong>Parameters</strong></li><li class="list-group-item"><dl class="dl-horizontal"><dt>private</dt><dd><code>boolean</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>false</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>true</span></span><p>Make this recipe private</p>
+</dd><dt>detail</dt><dd><code>boolean</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>false</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>true</span></span><p>Return calculated recipe details</p>
+</dd><dt>recipe</dt><dd><code>object</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>{...}</span></span><p>A JSON representation of a recipe</p>
+</dd></dl></li></ul><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#384074" class="pull-right">Toggle</a></li><li id="384074" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json; charset=utf-8</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">detail</span>": <span class="value"><span class="literal">true</span></span>,
+    "<span class="attribute">recipe</span>": <span class="value">{
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"Recipe name"</span></span>,
+        "<span class="attribute">description</span>": <span class="value"><span class="string">"Recipe description"</span></span>,
+        "<span class="attribute">fermentables</span>": <span class="value">[
+            {
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Pale malt"</span></span>,
+                "<span class="attribute">weight</span>": <span class="value"><span class="number">3.5</span></span>,
+                "<span class="attribute">yield</span>": <span class="value"><span class="number">0.75</span></span>,
+                "<span class="attribute">color</span>": <span class="value"><span class="number">4.0</span>
+            </span>}
+        ]
+    </span>}
+</span>}
+</code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#327819" class="pull-right">Toggle</a></li><li id="327819" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json; charset=utf-8</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-11-02T17:25:51.275Z"</span></span>, 
+    "<span class="attribute">data</span>": <span class="value">{
+        "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+        "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">agingTempF</span>": <span class="value"><span class="number">68</span></span>, 
+        "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+        "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">batchSizeGallons</span>": <span class="value"><span class="number">5.283440000000001</span></span>, 
+        "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+        "<span class="attribute">boilSizeGallons</span>": <span class="value"><span class="number">2.6417200000000003</span></span>, 
+        "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">2.5</span></span>, 
+        "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">23</span></span>, 
+        "<span class="attribute">bottlingTempF</span>": <span class="value"><span class="number">73.4</span></span>, 
+        "<span class="attribute">description</span>": <span class="value"><span class="string">"Just a basic beer example for testing. foo this is a long description"</span></span>, 
+        "<span class="attribute">fermentables</span>": <span class="value">[
+            {
+                "<span class="attribute">color</span>": <span class="value"><span class="number">6.096</span></span>, 
+                "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Extra pale extract"</span></span>, 
+                "<span class="attribute">weight</span>": <span class="value"><span class="number">4.5</span></span>, 
+                "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+            </span>}
+        ]</span>, 
+        "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+        "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+        "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"Another Beer 2"</span></span>, 
+        "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+        "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">primaryTempF</span>": <span class="value"><span class="number">68</span></span>, 
+        "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">secondaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+        "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+        "<span class="attribute">servingSizeOz</span>": <span class="value"><span class="number">0.09378106</span></span>, 
+        "<span class="attribute">spices</span>": <span class="value">[
+            {
+                "<span class="attribute">aa</span>": <span class="value"><span class="number">4.5</span></span>, 
+                "<span class="attribute">form</span>": <span class="value"><span class="string">"pellet"</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Cascade hops"</span></span>, 
+                "<span class="attribute">time</span>": <span class="value"><span class="number">60</span></span>, 
+                "<span class="attribute">use</span>": <span class="value"><span class="string">"boil"</span></span>, 
+                "<span class="attribute">weight</span>": <span class="value"><span class="number">0.028349556839727483</span>
+            </span>}
+        ]</span>, 
+        "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+        "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+        "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">tertiaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+        "<span class="attribute">yeast</span>": <span class="value">[
+            {
+                "<span class="attribute">attenuation</span>": <span class="value"><span class="number">74</span></span>, 
+                "<span class="attribute">form</span>": <span class="value"><span class="string">"liquid"</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Wyeast 3052"</span></span>, 
+                "<span class="attribute">type</span>": <span class="value"><span class="string">"ale"</span>
+            </span>}
+        ]
+    </span>}</span>, 
+    "<span class="attribute">id</span>": <span class="value"><span class="string">"5275359f031555931a000005"</span></span>, 
+    "<span class="attribute">private</span>": <span class="value"><span class="literal">false</span></span>, 
+    "<span class="attribute">slug</span>": <span class="value"><span class="string">"another-beer-2"</span></span>, 
+    "<span class="attribute">user</span>": <span class="value">{
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+        "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span>
+    </span>}
+</span>}
+</code></pre></li></ul></section><h4 id="resource-recipe">Recipe</h4><p>A single recipe.</p>
+<section id="recipes-recipe-get" class="panel panel-info"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Get a recipe</span><span class="btn btn-xs btn-primary">GET</span>&nbsp;<code>/v1/recipes/{id}</code></div><div class="panel-body"></div><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#341992" class="pull-right">Toggle</a></li><li id="341992" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json; charset=utf-8</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-11-02T17:25:51.275Z"</span></span>, 
+    "<span class="attribute">data</span>": <span class="value">{
+        "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+        "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">agingTempF</span>": <span class="value"><span class="number">68</span></span>, 
+        "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+        "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">batchSizeGallons</span>": <span class="value"><span class="number">5.283440000000001</span></span>, 
+        "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+        "<span class="attribute">boilSizeGallons</span>": <span class="value"><span class="number">2.6417200000000003</span></span>, 
+        "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">2.5</span></span>, 
+        "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">23</span></span>, 
+        "<span class="attribute">bottlingTempF</span>": <span class="value"><span class="number">73.4</span></span>, 
+        "<span class="attribute">description</span>": <span class="value"><span class="string">"Just a basic beer example for testing. foo this is a long description"</span></span>, 
+        "<span class="attribute">fermentables</span>": <span class="value">[
+            {
+                "<span class="attribute">color</span>": <span class="value"><span class="number">6.096</span></span>, 
+                "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Extra pale extract"</span></span>, 
+                "<span class="attribute">weight</span>": <span class="value"><span class="number">4.5</span></span>, 
+                "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+            </span>}
+        ]</span>, 
+        "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+        "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+        "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"Another Beer 2"</span></span>, 
+        "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+        "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">primaryTempF</span>": <span class="value"><span class="number">68</span></span>, 
+        "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">secondaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+        "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+        "<span class="attribute">servingSizeOz</span>": <span class="value"><span class="number">0.09378106</span></span>, 
+        "<span class="attribute">spices</span>": <span class="value">[
+            {
+                "<span class="attribute">aa</span>": <span class="value"><span class="number">4.5</span></span>, 
+                "<span class="attribute">form</span>": <span class="value"><span class="string">"pellet"</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Cascade hops"</span></span>, 
+                "<span class="attribute">time</span>": <span class="value"><span class="number">60</span></span>, 
+                "<span class="attribute">use</span>": <span class="value"><span class="string">"boil"</span></span>, 
+                "<span class="attribute">weight</span>": <span class="value"><span class="number">0.028349556839727483</span>
+            </span>}
+        ]</span>, 
+        "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+        "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+        "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">tertiaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+        "<span class="attribute">yeast</span>": <span class="value">[
+            {
+                "<span class="attribute">attenuation</span>": <span class="value"><span class="number">74</span></span>, 
+                "<span class="attribute">form</span>": <span class="value"><span class="string">"liquid"</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Wyeast 3052"</span></span>, 
+                "<span class="attribute">type</span>": <span class="value"><span class="string">"ale"</span>
+            </span>}
+        ]
+    </span>}</span>, 
+    "<span class="attribute">id</span>": <span class="value"><span class="string">"5275359f031555931a000005"</span></span>, 
+    "<span class="attribute">private</span>": <span class="value"><span class="literal">false</span></span>, 
+    "<span class="attribute">slug</span>": <span class="value"><span class="string">"another-beer-2"</span></span>, 
+    "<span class="attribute">user</span>": <span class="value">{
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+        "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span>
+    </span>}
+</span>}
+</code></pre></li></ul></section><section id="recipes-recipe-put" class="panel panel-warning"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Update a recipe</span><span class="btn btn-xs btn-warning">PUT</span>&nbsp;<code>/v1/recipes/{id}</code></div><div class="panel-body"></div><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>200</code></strong><a data-toggle="collapse" data-target="#423367" class="pull-right">Toggle</a></li><li id="423367" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="attribute">Content-Type</span>: <span class="string">application/json; charset=utf-8</span><br></code></pre><h5>Body</h5><pre><code>{
+    "<span class="attribute">created</span>": <span class="value"><span class="string">"2013-11-02T17:25:51.275Z"</span></span>, 
+    "<span class="attribute">data</span>": <span class="value">{
+        "<span class="attribute">agingDays</span>": <span class="value"><span class="number">14</span></span>, 
+        "<span class="attribute">agingTemp</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">agingTempF</span>": <span class="value"><span class="number">68</span></span>, 
+        "<span class="attribute">author</span>": <span class="value"><span class="string">"Anonymous Brewer"</span></span>, 
+        "<span class="attribute">batchSize</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">batchSizeGallons</span>": <span class="value"><span class="number">5.283440000000001</span></span>, 
+        "<span class="attribute">boilSize</span>": <span class="value"><span class="number">10</span></span>, 
+        "<span class="attribute">boilSizeGallons</span>": <span class="value"><span class="number">2.6417200000000003</span></span>, 
+        "<span class="attribute">bottlingPressure</span>": <span class="value"><span class="number">2.5</span></span>, 
+        "<span class="attribute">bottlingTemp</span>": <span class="value"><span class="number">23</span></span>, 
+        "<span class="attribute">bottlingTempF</span>": <span class="value"><span class="number">73.4</span></span>, 
+        "<span class="attribute">description</span>": <span class="value"><span class="string">"Just a basic beer example for testing. foo this is a long description"</span></span>, 
+        "<span class="attribute">fermentables</span>": <span class="value">[
+            {
+                "<span class="attribute">color</span>": <span class="value"><span class="number">6.096</span></span>, 
+                "<span class="attribute">late</span>": <span class="value"><span class="literal">false</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Extra pale extract"</span></span>, 
+                "<span class="attribute">weight</span>": <span class="value"><span class="number">4.5</span></span>, 
+                "<span class="attribute">yield</span>": <span class="value"><span class="number">75</span>
+            </span>}
+        ]</span>, 
+        "<span class="attribute">ibuMethod</span>": <span class="value"><span class="string">"tinseth"</span></span>, 
+        "<span class="attribute">mash</span>": <span class="value"><span class="literal">null</span></span>, 
+        "<span class="attribute">mashEfficiency</span>": <span class="value"><span class="number">75</span></span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"Another Beer 2"</span></span>, 
+        "<span class="attribute">primaryDays</span>": <span class="value"><span class="number">14</span></span>, 
+        "<span class="attribute">primaryTemp</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">primaryTempF</span>": <span class="value"><span class="number">68</span></span>, 
+        "<span class="attribute">secondaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">secondaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">secondaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+        "<span class="attribute">servingSize</span>": <span class="value"><span class="number">0.355</span></span>, 
+        "<span class="attribute">servingSizeOz</span>": <span class="value"><span class="number">0.09378106</span></span>, 
+        "<span class="attribute">spices</span>": <span class="value">[
+            {
+                "<span class="attribute">aa</span>": <span class="value"><span class="number">4.5</span></span>, 
+                "<span class="attribute">form</span>": <span class="value"><span class="string">"pellet"</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Cascade hops"</span></span>, 
+                "<span class="attribute">time</span>": <span class="value"><span class="number">60</span></span>, 
+                "<span class="attribute">use</span>": <span class="value"><span class="string">"boil"</span></span>, 
+                "<span class="attribute">weight</span>": <span class="value"><span class="number">0.028349556839727483</span>
+            </span>}
+        ]</span>, 
+        "<span class="attribute">steepEfficiency</span>": <span class="value"><span class="number">50</span></span>, 
+        "<span class="attribute">steepTime</span>": <span class="value"><span class="number">20</span></span>, 
+        "<span class="attribute">style</span>": <span class="value"><span class="literal">null</span></span>, 
+        "<span class="attribute">tertiaryDays</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">tertiaryTemp</span>": <span class="value"><span class="number">0</span></span>, 
+        "<span class="attribute">tertiaryTempF</span>": <span class="value"><span class="number">32</span></span>, 
+        "<span class="attribute">yeast</span>": <span class="value">[
+            {
+                "<span class="attribute">attenuation</span>": <span class="value"><span class="number">74</span></span>, 
+                "<span class="attribute">form</span>": <span class="value"><span class="string">"liquid"</span></span>, 
+                "<span class="attribute">name</span>": <span class="value"><span class="string">"Wyeast 3052"</span></span>, 
+                "<span class="attribute">type</span>": <span class="value"><span class="string">"ale"</span>
+            </span>}
+        ]
+    </span>}</span>, 
+    "<span class="attribute">id</span>": <span class="value"><span class="string">"5275359f031555931a000005"</span></span>, 
+    "<span class="attribute">private</span>": <span class="value"><span class="literal">false</span></span>, 
+    "<span class="attribute">slug</span>": <span class="value"><span class="string">"another-beer-2"</span></span>, 
+    "<span class="attribute">user</span>": <span class="value">{
+        "<span class="attribute">id</span>": <span class="value"><span class="string">"51de54131084ffeef8000001"</span></span>, 
+        "<span class="attribute">image</span>": <span class="value"><span class="string">"http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&amp;d=retro"</span></span>, 
+        "<span class="attribute">name</span>": <span class="value"><span class="string">"daniel"</span>
+    </span>}
+</span>}
+</code></pre></li></ul></section><section id="recipes-recipe-delete" class="panel panel-danger"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Delete a recipe</span><span class="btn btn-xs btn-danger">DELETE</span>&nbsp;<code>/v1/recipes/{id}</code></div><div class="panel-body"></div><ul class="list-group"><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>204</code></strong></li></ul></section></div></div></div></div></div><p style="text-align: center;" class="text-muted">Generated by <a href="http://github.com/danielgtaylor/aglio" class="aglio">aglio</a> on 17 Nov 2013</p></body><script src="http://code.jquery.com/jquery-1.10.1.min.js"></script><script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script><script type="text/javascript">
+(function() {
+  $('table').addClass('table');
+
+}).call(this);
+</script></html>
