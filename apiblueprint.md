@@ -1,15 +1,82 @@
 FORMAT: 1A
 HOST: https://api.malt.io
 
-# Tapline API
-Tapline is the [Malt.io](http://beta.malt.io/) API. It provides access to users, recipes, and conversion/calculation functions that any client can use if they can speak REST and JSON.
+Tapline Homebrewing API
+=======================
+Tapline is an API for [Malt.io](http://beta.malt.io/), a homebrewing community website. It provides access to users, recipes, and conversion/calculation functions that any client can use if they can speak HTTPS and JSON.
+
+Tapline is split into two logical components. You can use just one of these, or both if your application requires it. The simplest is the public API because it does not require getting authorization from an existing user nor sending any special headers. Be aware that the public API provides **read-only** access to stored state like recipes. To create, edit, or delete recipes you must use the authenticated API instead.
+
+ 1. Public API
+
+    * Utility functions
+
+    * Read-only access to users, recipes, etc
+
+    * Creating new users
+
+    * Getting authorizations
+
+ 1. Authenticated API
+
+    * Full access to users, recipes, etc
 
 ## Examples
 
- * TODO: jsfiddle examples of a few calls
+ * [Display a list of users](http://jsfiddle.net/danielgtaylor/vn3Rt/)
+
+## Formats
+JSON is the primary format used within Tapline, but for the HTTP `GET` request method query arguments are typically used. For example, to get a list of recipes:
+
+```http
+GET /v1/public/recipes?limit=5&sort=name HTTP/1.1
+```
+
+The above uses HTTP query parameters, while `POST`, `PUT`, and `DELETE` methods use JSON. For example, modifying a recipe would use a JSON content body:
+
+```http
+PUT /v1/recipes/3jl452lk42h3 HTTP/1.1
+Content-Type: application/json
+Authorization: bearer k4j534h53j4lh53l4j5
+
+{
+    private: false,
+    recipe: {
+        "name": "My Recipe",
+        "description": "...",
+        ...
+    }
+}
+```
+
+Responses will always return JSON when successful, and a plain text error message when an error has occured. For example:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Request-ID: k23l4j2
+X-Response-Time: 16ms
+
+{
+    "id": "23k4j2k3j42h34",
+    "name": "User name",
+    ...
+}
+```
+
+An error, on the other hand, would be returned like this:
+
+```http
+HTTP/1.1 400 BAD REQUEST
+Content-Type: text/html
+X-Request-ID: hf324d6j
+X-Response-Time: 2ms
+
+Error: JSON object property 'sort' is not in enum
+```
 
 # Group Anonymous Public API
-Public calls that do not require authentication.
+Public calls that do not require authentication. These calls cannot change stored state - for example you can only **read** recipes, not **write** them. See the authenticated API calls for information on how to write data on behalf of a user.
 
 ## Convert Duration [/v1/convert/duration]
 
@@ -22,8 +89,10 @@ Public calls that do not require authentication.
             + `minutes`
             + `display`
 
+    + approximate (optional, integer, `2`) ... Approximate the display duration to this many significant units. For example, `'2 days 1 hour 15 minutes'` approximated to `2` would be `'2 days 1 hour'`.
+
 ### Convert [POST]
-Utilities to convert one or more representations of durations.
+Utilities to convert one or more representations of durations. Converts between a number of minutes and a user-friendly string representation of a duration.
 
 + Request
 
@@ -68,6 +137,12 @@ Utilities to convert one or more representations of durations.
 + Parameters
 
     + format (required, string, `ebc`) ... Input format
+
+        + Values
+            + `ebc`
+            + `srm`
+            + `lovibond`
+
     + values (required, array, `[1, 2]`) ... List of colors to convert
     + outputFormat = `ebc` (optional, string, `srm`) ... Output format
 
@@ -130,6 +205,11 @@ Utilities to convert one or more representations of colors.
 + Parameters
 
     + format (required, string, `beerxml`) ... Input format
+
+        + Values
+            + `json`
+            + `beerxml`
+
     + recipes (required, array, `['<beerxml>...</beerxml>']`) ... List of recipes to convert
     + outputFormat = `json` (optional, string, `beerxml`) ... Output format
 
@@ -209,7 +289,7 @@ Utilities to convert one or more representations of a serialized recipe.
 
     Invalid output format 'foo'!
 
-## Calculate Recipe [/v1/convert/recipe]
+## Calculate Recipe [/v1/calculate/recipe]
 
 + Parameters
 
@@ -294,7 +374,7 @@ Utilities to convert one or more representations of a serialized recipe.
 
     Invalid input format 'foo'!
 
-## Recipe Collection [/v1/public/recipes{?ids,userIds,slugs,offset,limit,sort,detail}]
+## Recipe Collection [/v1/public/recipes]
 A collection of recipes.
 
 + Parameters
@@ -481,7 +561,88 @@ https://api.malt.io/v1/public/recipes?detail=true
 
     Invalid sort option
 
-## User Collection [/v1/public/users{?ids,names,offset,limit,sort,fromLong,fromLat}]
+## Actions Collection [/v1/public/actions]
+
++ Model
+A list of user actions.
+
+    + Headers
+    
+            Content-Type: application/json; charset=utf-8
+
+    + Body
+
+            [
+                {
+                    "created": "2013-11-12T05:52:58.487Z", 
+                    "data": {
+                        "abv": 6.294638860098035, 
+                        "color": 7.9427671464530025, 
+                        "description": "Just a basic beer example for testing. foo this is a long description", 
+                        "fg": 1.016921452853955, 
+                        "ibu": 8.232188432976319, 
+                        "name": "Another Beer 2", 
+                        "og": 1.0650825109767499, 
+                        "slug": "another-beer-2"
+                    }, 
+                    "id": "5281c23a5889ca3e8b000001", 
+                    "private": false, 
+                    "targetId": "5275359f031555931a000005", 
+                    "type": "recipe-updated", 
+                    "user": {
+                        "id": "51de54131084ffeef8000001", 
+                        "image": "http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&d=retro", 
+                        "name": "daniel"
+                    }
+                }, 
+                {
+                    "created": "2013-11-12T00:23:43.863Z", 
+                    "data": {
+                        "abv": 6.294638860098035, 
+                        "color": 7.9427671464530025, 
+                        "description": "Just a basic beer example for testing. foo this is a long description", 
+                        "fg": 1.016921452853955, 
+                        "ibu": 8.232188432976319, 
+                        "name": "Another Beer 2", 
+                        "og": 1.0650825109767499, 
+                        "slug": "another-beer-2"
+                    }, 
+                    "id": "5281750f0f7d42a578000004", 
+                    "private": false, 
+                    "targetId": "5275359f031555931a000005", 
+                    "type": "recipe-updated", 
+                    "user": {
+                        "id": "51de54131084ffeef8000001", 
+                        "image": "http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&d=retro", 
+                        "name": "daniel"
+                    }
+                },
+            ]
+
+### Get actions [GET]
+Gets a list of user actions.
+
++ Parameters
+
+    + userIds (optional, array, `['id1', 'id2']`) ... List of user IDs
+    + ids (optional, array, `['id1', 'id2']`) ... List of action IDs
+    + offset = `0` (optional, integer, `0`) ... Number of recipes to skip
+    + limit = `20` (optional, integer, `30`) ... Number of recipes returned
+    + sort = `name` (optional, string, `-created`) ... Sort method
+    
+        + Values
+            + `created`
+            + `-created`
+
++ Response 200
+
+    [Actions Collection][]
+
++ Response 400
+
+    Invalid sort option
+
+## User Collection [/v1/public/users]
 A collection of users.
 
 + Parameters
@@ -656,6 +817,7 @@ A collection of recipes.
             + `-name`
 
     + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
+    + private = `false` (optiona, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
 
 + Response 200
 
@@ -844,6 +1006,12 @@ A single recipe.
 
 ### Get a recipe [GET]
 
++ Parameters
+
+    + id (optional, string, `100`) ... Recipe ID
+    + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
+    + private = `false` (optional, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
+
 + Response 200
 
     [Recipe][]
@@ -857,3 +1025,17 @@ A single recipe.
 ### Delete a recipe [DELETE]
 
 + Response 204
+
+# Group Users
+
+## User Collection [/v1/users]
+
+### Get users [GET]
+
+## User [/v1/users/{id}]
+
+### Get a recipe [GET]
+
+### Update a recipe [PUT]
+
+### Delete a recipe [DELETE]
