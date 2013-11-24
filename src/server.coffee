@@ -186,7 +186,7 @@ app.get '/account/authorize/google', passport.authenticate('google', scope: 'ope
 app.get '/account/authorize/google/callback', loginController.login('google')
 
 app.get '/', (req, res) ->
-    res.status(200).sendfile 'public/apidoc.html'
+    res.status(200).sendfile "#{path.dirname(__dirname)}/public/apidoc.html"
 
 # Start the server
 exports.start = (listen, done) ->
