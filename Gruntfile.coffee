@@ -10,14 +10,6 @@ module.exports = (grunt) ->
                 args: ['--dbpath', 'db']
             beanstalkd:
                 cmd: 'beanstalkd'
-            tapline_worker:
-                cmd: './bin/tapline-worker.js'
-                options:
-                    verbose: true
-            tapline:
-                cmd: './bin/tapline.js'
-                options:
-                    verbose: true
         shell:
             'dbdir':
                 command: 'mkdir -p db'
@@ -49,10 +41,9 @@ module.exports = (grunt) ->
         watch:
             tapline:
                 files: ['src/**.coffee']
-                tasks: ['server']
-            worker:
-                files: ['src/worker/**.coffee']
-                tasks: ['worker']
+                tasks: ['compile', 'server', 'worker']
+                options:
+                    nospawn: true
         mochacov:
             test:
                 options:
@@ -77,11 +68,41 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks 'grunt-contrib-watch'
     grunt.loadNpmTasks 'grunt-mocha-cov'
 
+    # The following is to run services during development and restart
+    # them as needed. Normally you could use grunt-develop, but it is
+    # limited to a single process and I need at least two: the API server
+    # and a job queue worker.
+    processes = {}
+    rundev = (name, command) ->
+        return ->
+            # Kill the process if it is currently running
+            if processes[name]
+                processes[name].kill()
+                delete processes[name]
+
+            # Spawn the new process
+            processes[name] = grunt.util.spawn cmd: process.argv[0], args: [command], -> false
+
+            # Print info when exiting or writing output to stdout
+            processes[name].on 'exit', (code, signal) ->
+                grunt.log.warn "#{name} exiting"
+
+            processes[name].stdout.on 'data', (buffer) ->
+                grunt.log.write "[#{name}] > ".cyan + String(buffer)
+
+            grunt.log.write '>> '.green + "Started #{name}"
+
+    # Cleanup any spawned processes on Ctrl-C
+    process.on 'exit', ->
+        for name, child of processes
+            child.kill()
+
+    grunt.registerTask 'worker', 'Start a job queue worker', rundev('worker', 'bin/tapline-worker.js')
+    grunt.registerTask 'server', 'Start a server', rundev('tapline', 'bin/tapline.js')
+
     grunt.registerTask 'compile', ['coffeelint', 'coffee']
     grunt.registerTask 'db', ['shell:dbdir', 'external_daemon:mongodb']
     grunt.registerTask 'queue', ['external_daemon:beanstalkd']
-    grunt.registerTask 'worker', ['external_daemon:tapline_worker']
-    grunt.registerTask 'server', ['external_daemon:tapline']
     grunt.registerTask 'test', ['db', 'shell:drop-test-db', 'compile', 'mochacov:test']
     grunt.registerTask 'coverage', ['db', 'shell:drop-test-db', 'compile', 'mochacov:html']
     grunt.registerTask 'coveralls', ['db', 'shell:drop-test-db', 'compile', 'mochacov:reportcoverage']
