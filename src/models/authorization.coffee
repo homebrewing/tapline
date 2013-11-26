@@ -5,6 +5,7 @@ AuthorizationSchema = new mongoose.Schema
     token:
         type: String
         unique: true
+        index: 1
         default: ->
             crypto.randomBytes(20).toString 'hex'
     userId:
@@ -18,5 +19,8 @@ AuthorizationSchema = new mongoose.Schema
     created:
         type: Date
         default: Date.now
+
+# Cover common queries
+AuthorizationSchema.index {userId: 1, clientId: 1}
 
 module.exports = mongoose.model 'Authorization', AuthorizationSchema

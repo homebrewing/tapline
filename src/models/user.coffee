@@ -93,4 +93,7 @@ UserSchema.methods =
             @passwordHash = hash
             done?()
 
+# Cover common queries
+UserSchema.index {id: 1, name: 1, created: -1}
+
 module.exports = User = mongoose.model 'User', UserSchema

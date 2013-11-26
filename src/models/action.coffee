@@ -26,4 +26,7 @@ ActionSchema = new mongoose.Schema
     data:
         type: mongoose.Schema.Types.Mixed
 
+# Cover common queries
+ActionSchema.index {id: 1, user: 1, private: 1}
+
 module.exports = mongoose.model 'Action', ActionSchema

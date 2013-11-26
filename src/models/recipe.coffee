@@ -39,4 +39,7 @@ RecipeSchema = new mongoose.Schema
 # Make user+slug unique
 RecipeSchema.index {user: 1, slug: 1}, {unique: true}
 
+# Cover common queries
+RecipeSchema.index {id: 1, user: 1, name: 1, created: -1, slug: 1, private: 1, grade: -1}
+
 module.exports = mongoose.model 'Recipe', RecipeSchema
