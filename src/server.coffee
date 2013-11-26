@@ -42,7 +42,8 @@ app.configure ->
     app.set 'view engine', 'jade'
     app.use '/v1', require('./middleware/cors')
     app.use express.responseTime()
-    app.use express.bodyParser()
+    app.use express.urlencoded()
+    app.use express.json()
     app.use express.methodOverride()
     app.use require('./middleware/requestId')
     app.use require('./middleware/log')
