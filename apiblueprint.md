@@ -75,6 +75,19 @@ X-Response-Time: 2ms
 Error: JSON object property 'sort' is not in enum
 ```
 
+## User Profile Images
+Users have an assigned profile image URL, available in the `image` property of the user object. The URL should have a text replacement run on it before being used. A typical image URL may look like:
+
+```no-highlight
+http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&d=retro
+```
+
+Before use, the `SIZE` string would be replaced with an appropriate size in pixels, for example:
+
+```no-highlight
+http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=64&d=retro
+```
+
 # Group Anonymous Public API
 Public calls that do not require authentication. These calls cannot change stored state - for example you can only **read** recipes, not **write** them. See the authenticated API calls for information on how to write data on behalf of a user.
 
@@ -218,7 +231,7 @@ Utilities to convert one or more representations of colors.
             + `beerxml`
 
 ### Convert [POST]
-Utilities to convert one or more representations of a serialized recipe.
+Utilities to convert one or more representations of a serialized recipe. Currently supported are BeerXML 1.0 and the Brauhaus JSON format. Note that these conversions are not 1:1, so you may lose data by converting between formats. For example, Brauhaus JSON stores the IBU calculation method while BeerXML does not.
 
 + Request
 
@@ -303,7 +316,7 @@ Utilities to convert one or more representations of a serialized recipe.
     + siUnits = `true` (optional, boolean, `false`) ... True to use kg, liters and &deg;C instead of lb, oz, gallons, and &deg;F
 
 ### Calculate [POST]
-Utilities to convert one or more representations of a serialized recipe.
+Utilities to calculate the OG, FG, IBU, ABV, and other values from one or more serialized recipes. This method also generates a brew day timeline for the recipe.
 
 + Request
 
@@ -375,7 +388,7 @@ Utilities to convert one or more representations of a serialized recipe.
     Invalid input format 'foo'!
 
 ## Recipe Collection [/v1/public/recipes]
-A collection of recipes.
+A collection of public homebrew recipes.
 
 + Parameters
 
@@ -547,7 +560,7 @@ A list of recipes
             ]
 
 ### Get recipes [GET]
-Gets a list of recipes given the input parameters for filtering and sorting. An example call would look like this:
+Gets a list of public recipes given the input parameters for filtering and sorting. An example call would look like this:
 
 ```no-highlight
 https://api.malt.io/v1/public/recipes?detail=true
@@ -562,6 +575,7 @@ https://api.malt.io/v1/public/recipes?detail=true
     Invalid sort option
 
 ## Actions Collection [/v1/public/actions]
+A collection of public actions taken by users, such as creating a new recipe or following another brewer.
 
 + Model
 A list of user actions.
@@ -620,7 +634,11 @@ A list of user actions.
             ]
 
 ### Get actions [GET]
-Gets a list of user actions.
+Gets a list of public user actions with the given options for filtering and sorting. An example call would look like this:
+
+```no-highlight
+https://api.malt.io/v1/public/actions?userIds=id1,id2,id3
+```
 
 + Parameters
 
@@ -643,7 +661,7 @@ Gets a list of user actions.
     Invalid sort option
 
 ## User Collection [/v1/public/users]
-A collection of users.
+A collection of public users.
 
 + Parameters
 
@@ -703,7 +721,7 @@ A collection of users.
             ]
 
 ### Get users [GET]
-Gets a list of users given the input parameters for filtering and sroting. An example call would look like this:
+Gets a list of public users given the input parameters for filtering and sorting. An example call would look like this:
 
 ```no-highlight
 https://api.malt.io/v1/public/users?limit=5
@@ -718,9 +736,16 @@ https://api.malt.io/v1/public/users?limit=5
     Invalid sort option
 
 ## Register new user [/v1/users]
-Registers a new user account with a username and password. This user will not be able to use social authentication to log in.
+Registers a new user account with a username and password. This user will not be able to use social authentication to log in, and instead must use a username and password. The user account will remain unverified until a link from the confirmation email is clicked.
 
 ### POST
+
++ Parameters
+
+    + email (required, string, `foo@bar.com`) ... The user's email address (not visible to others)
+    + name (required, string, `username`) ... A unique user name
+    + image (required, string, `http://...`) ... URL to an image of the user
+    + location (required, array, `[-122.331, 47.61]`) ... The location of the user, as `[latitude, longitude]` in degrees. Seattle (47.61&deg;N, 122.331&deg;W) would be `[-122.331, 47.61]`.
 
 + Request
 
@@ -760,21 +785,39 @@ Registers a new user account with a username and password. This user will not be
     Invalid username!
 
 # Group Authentication
-The API is split into two parts: the public API and the authenticated API. The public API requires no authentication and will list public information about users and recipes as well as providing converters and calculators.
-
-The authenticated API, on the other hand, **requires** an OAuth bearer token in an HTTP authorization header. For example:
+The API is split into two parts: the public API and the authenticated API. The public API described above requires no authentication. The authenticated API (everything after this section), on the other hand, **requires** an OAuth bearer token in an HTTP authorization header. For example, the header might look like this:
 
 ```http
 Authorization: bearer 5262d64b892e8d4341000001
 ```
 
-In order to get an authorization token, you must first register an application. Then, using your application token you request access on behalf of a user and are given an OAuth bearer token to use for subsequent requests.
+In order to get an authorization token, you must first register an application. Then, using your application token you request access on behalf of a user and are given an OAuth bearer token to use for subsequent requests. The OAuth bearer token is proof that a specific user has given your specific application access to use the API on his or her behalf.
 
 ## Registering an application
-TODO
+**TODO**: Describe how to register a new application and manage applications.
+
+## Authorization scopes
+The following scopes are available to your application. You should only request scopes that your application needs. Keep in mind that requesting destructive scopes may drive users away from your application. As you can see in the table, reading of public data requires no scopes - it is only writing and deleting of data or viewing private data that requires you to specify scopes.
+
+| Item                        | Read         | Write              | Delete          |
+| --------------------------- | ------------ | ------------------ | --------------- |
+| Public user account info    | -            | `user`             | `user:delete`   |
+| Public user actions         | -            | `user` or `recipe` | n/a             |
+| Public recipes              | -            | `recipe`           | `recipe:delete` |
+| Public brews                | -            | `recipe`           | `recipe:delete` |
+| Private account email       | `user:email` | n/a                | n/a             |
+| Private actions and recipes | `private`    | `private`          | `private`       |
 
 ## Getting an OAuth token
-To get an OAuth token for a user, you use a special URL. For example:
+There are several ways of getting an OAuth bearer token. Typical web or mobile applications will use a special URI that redirects a user to log in or create an account, then asks the user to grant your application access. Once granted, the user is redirected back to your website or app with a special token. Less typical applications can get an authorization token by getting the username and password from a user, and making an API call using HTTP Basic Auth. Once the token is returned the application can discard the user's password, and the password should never be stored.
+
+### Getting a token via URI redirect
+There are two variations of this approach, one which requires a backend server which knows your client application secret, and another which requires no backend nor secret but instead requires a preconfigured redirect URI. The second approach is especially useful for static websites.
+
+#### Using a client secret
+**TODO**: Describe how to use a client secret with its token type
+
+#### Using a preconfigured redirect URI
 
 ```no-highlight
 https://api.malt.io/account/authorize?response_type=code&redirect_uri={website}&scope=user,recipe&client_id={client}&type=token
@@ -785,13 +828,170 @@ https://api.malt.io/account/authorize?response_type=code&redirect_uri={website}&
 | website  | URL to your website's handler | http://beta.malt.io/auth/callback |
 | client   | Your application token        | 51de552db0848b204b554089          |
 
-If the user authorizes your application then the user is redirected to the `website` URL above, which the token in a hash value:
+If the user authorizes your application then the user is redirected to the `website` URL above, which contains the token in a hash value:
 
 ```no-highlight
 http://your-website.com/auth/callback#access_token:5262d64b892e8d4341000001
 ```
 
 Save this token and you can use it for all subsequent requests that require auth.
+
+### Getting a token via an API call
+This method of getting an authorization token **requires** that you have access to a user's username and password. Accounts that use only social login and thus do not have a password set up cannot work with this method. Users typically prefer the methods described above, because they do not require giving a third party their password. You *must not store the user's password* longer than needed to get a token.
+
+## Authorization Token Collection [/v1/authorizations]
+
+### List tokens [GET]
+Get a list of authorization tokens for your application client ID and a specific user. **This request requires HTTP Basic Auth.** Example request:
+
+```no-highlight
+https://api.malt.io/v1/authorizations?clientId=abc123&clientSecret=some-secret
+```
+
++ Parameters
+
+    + clientId (required, string, `abc123`) ... The application client ID
+    + clientSecret (required, string, `foo`) ... The application client secret
+
++ Request
+    
+    + Headers
+
+            Content-Type: application/json
+            Authorization: Basic ZGFuaWVsOmFiYzEyMw==
+
++ Response 200 (application/json)
+
+    + Body
+
+        [
+            {
+                "clientId": "abc123",
+                "created": "2013-07-11T17:28:52.787Z",
+                "id": "51deeb54763ce70000000001",
+                "scopes": [
+                    "user",
+                    "recipe"
+                ],
+                "token": "b608d4b097c838067aba07eb9206faab1bf4b446",
+                "userId": "51de54131084ffeef8000001"
+            }
+        ]
+
+### Create an authorization [POST]
+Create a new authorization token with your given client ID for a given user.
+
++ Parameters
+
+    + clientId (required, string, `abc123`) ... The application client ID
+    + clientSecret (required, string, `foo`) ... The application client secret
+    + scopes (required, array, `['user', 'recipe', 'private']`) ... A list of authorization scopes that your application requires
+
++ Request
+    
+    + Headers
+
+            Content-Type: application/json
+            Authorization: Basic ZGFuaWVsOmFiYzEyMw==
+
+    + Body
+
+        {
+            "clientId": "abc123",
+            "clientSecret": "some-secret",
+            "scopes": [
+                "user",
+                "recipe"
+            ]
+        }
+
++ Response 201 (application/json)
+
+    + Body
+
+        {
+            "clientId": "abc123",
+            "created": "2013-07-11T17:28:52.787Z",
+            "id": "51deeb54763ce70000000001",
+            "scopes": [
+                "user",
+                "recipe"
+            ],
+            "token": "b608d4b097c838067aba07eb9206faab1bf4b446",
+            "userId": "51de54131084ffeef8000001"
+        }
+
+## Authorization [/v1/authorizations/{id}]
+Get, update, and delete individual authorizations.
+
+### Get authorization [GET]
+Get a single authorization by its ID. The authorization must be for your application, specified in the `clientId`.
+
++ Parameters
+
+    + id (required, string, `51deeb54763ce70000000001`) ... Authorization ID
+
++ Response 200 (application/json)
+
+    + Body
+
+        {
+            "clientId": "abc123",
+            "created": "2013-07-11T17:28:52.787Z",
+            "id": "51deeb54763ce70000000001",
+            "scopes": [
+                "user",
+                "recipe"
+            ],
+            "token": "b608d4b097c838067aba07eb9206faab1bf4b446",
+            "userId": "51de54131084ffeef8000001"
+        }
+
+### Update authorization [PUT]
+Update a single authorization's scopes by its ID.
+
++ Parameters
+
+    + id (required, string, `51deeb54763ce70000000001`) ... Authorization ID
+    + clientId (required, string, `abc123`) ... The application client ID
+    + clientSecret (required, string, `foo`) ... The application client secret
+    + scopes (optional, array, `['user', 'recipe', 'private']`) ... A list of authorization scopes that your application requires
+    + addScopes (optional, array, `['recipe:delete']`) ... A list of authorization scopes to add
+    + removeScopes (optional, array, `['private']`) ... A list of authorization scopes to remove
+
++ Request
+
+    + Body
+
+        {
+            "clientId": "abc123",
+            "clientSecret": "some-secret",
+            "addScopes": [
+                "recipe:delete",
+                "private"
+            ]
+        }
+
++ Response 200 (application/json)
+
+    + Body
+
+        {
+            "clientId": "abc123",
+            "created": "2013-07-11T17:28:52.787Z",
+            "id": "51deeb54763ce70000000001",
+            "scopes": [
+                "user",
+                "recipe"
+            ],
+            "token": "b608d4b097c838067aba07eb9206faab1bf4b446",
+            "userId": "51de54131084ffeef8000001"
+        }
+
+### Delete authorization [DELETE]
+Delete an authorization. Afterward the token associated with this authorization will no longer work to make authenticated API calls.
+
++ Response 204
 
 # Group Recipes
 Authenticated calls to get, modify and delete recipes.
@@ -800,6 +1000,7 @@ Authenticated calls to get, modify and delete recipes.
 A collection of recipes.
 
 ### Get recipes [GET]
+Get a list of recipes with the given filtering and sorting parameters. By default only public recipes are returned, but the `private` parameter can be set so that private recipes are included.
 
 + Parameters
 
@@ -817,13 +1018,20 @@ A collection of recipes.
             + `-name`
 
     + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
-    + private = `false` (optiona, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
+    + private = `false` (optional, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
+
++ Request
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
 
 + Response 200
 
     [Recipe Collection][]
 
 ### Create a new recipe [POST]
+Create a new recipe. If `private` is true, then this recipe will not show up in public recipe lists.
 
 + Parameters
 
@@ -831,23 +1039,29 @@ A collection of recipes.
     + detail = `false` (optional, boolean, `true`) ... Return calculated recipe details
     + recipe (required, object, `{...}`) ... A JSON representation of a recipe
 
-+ Request (application/json; charset=utf-8)
++ Request (application/json)
 
-    {
-        "detail": true,
-        "recipe": {
-            "name": "Recipe name",
-            "description": "Recipe description",
-            "fermentables": [
-                {
-                    "name": "Pale malt",
-                    "weight": 3.5,
-                    "yield": 0.75,
-                    "color": 4.0
-                }
-            ]
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
+
+    + Body
+
+        {
+            "detail": true,
+            "recipe": {
+                "name": "Recipe name",
+                "description": "Recipe description",
+                "fermentables": [
+                    {
+                        "name": "Pale malt",
+                        "weight": 3.5,
+                        "yield": 0.75,
+                        "color": 4.0
+                    }
+                ]
+            }
         }
-    }
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -923,7 +1137,7 @@ A collection of recipes.
     }
 
 ## Recipe [/v1/recipes/{id}]
-A single recipe.
+A single recipe that is referenced by its ID.
 
 + Model
 
@@ -1005,37 +1219,184 @@ A single recipe.
         }
 
 ### Get a recipe [GET]
+Get a single recipe by its ID. If the recipe is private, then `private` must be set or a not found response will be returned.
 
 + Parameters
 
-    + id (optional, string, `100`) ... Recipe ID
+    + id (required, string, `100`) ... Recipe ID
     + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
     + private = `false` (optional, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
+
++ Request
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
 
 + Response 200
 
     [Recipe][]
 
 ### Update a recipe [PUT]
+Update a recipe by its ID.
+
++ Parameters
+
+    + id (required, string, `100`) ... Recipe ID
+    + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
+    + private = `false` (optional, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
+    + recipe (required, object, `{...}`) ... A JSON representation of a recipe
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
+
+    + Body
+
+        {
+            "detail": true,
+            "recipe": {
+                "name": "Recipe name",
+                "description": "Recipe description",
+                "fermentables": [
+                    {
+                        "name": "Pale malt",
+                        "weight": 3.5,
+                        "yield": 0.75,
+                        "color": 4.0
+                    }
+                ]
+            }
+        }
 
 + Response 200
 
     [Recipe][]
 
 ### Delete a recipe [DELETE]
+Delete a recipe by its ID.
+
++ Request
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
 
 + Response 204
 
 # Group Users
+Authenticated calls to get, modify and delete users.
 
 ## User Collection [/v1/users]
+A collection of users.
 
 ### Get users [GET]
+Get a list of users with the given filtering and sorting options. When `sort` is set to `location`, then the `fromLat` and `fromLong` parameters are **required**. Example request:
+
+```no-highlight
+https://api.malt.io/v1/users?names=user1,user2&limit=5&sort=-recipeCount
+```
+
++ Parameters
+
+    + ids (optional, array, `100,102,103`) ... User IDs
+    + names (optional, array, `name1,name2,name3`) ... User names
+    + offset = `0` (optional, integer, `0`) ... Number of users to skip
+    + limit = `20` (optional, integer, `30`) ... Number of users returned
+    + sort = `-created` (optional, string, `name`) ... Sort method
+    
+        + Values
+            + `created`
+            + `-created`
+            + `name`
+            + `-name`
+            + `location`
+            + `recipeCount`
+            + `-recipeCount`
+
+    + fromLat (optional, number, `47.61`) ... Latitude to use when `sort` is `location`
+    + fromLong (optional, number, `-122.331`) ... Longitude to use when `sort` is `location`
+
++ Request
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
+
++ Respone 200
+
+
 
 ## User [/v1/users/{id}]
+An individual user referenced by ID.
 
-### Get a recipe [GET]
++ Model (application/json)
 
-### Update a recipe [PUT]
+    {
+        "confirmed": true, 
+        "created": "2013-07-11T06:43:31.988Z", 
+        "following": [], 
+        "id": "51de54131084ffeef8000001", 
+        "image": "http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&d=retro", 
+        "location": [
+            -122.331, 
+            47.61
+        ], 
+        "name": "daniel", 
+        "recipeCount": 0
+    }
 
-### Delete a recipe [DELETE]
+### Get a user [GET]
+Get a single user by ID.
+
++ Parameters
+
+    + id (required, string, `lj23jh5jl42h3`) ... User ID
+
++ Request
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
+
++ Response 200
+
+    [User][]
+
+### Update a user [PUT]
+Update a user by ID.
+
++ Parameters
+
+    + id (required, number, `kl2j4h32`) ... User ID
+    + name (optional, string, `username`) ... User name
+    + email (optional, string, `foo@bar.com`) ... User email
+    + image (optional, string, `http://...`) ... URL to a user's profile image
+    + password (optional, string, `mypassword`) ... User password
+    + following (optional, array, `['101', '103']`) ... List of other users to follow by user ID
+    + addFollowing (optional, array, `['102']`) ... List of other users to add to the list of followed users by ID
+    + removeFollowing (optional, array, `['101']`) ... List of other users to remove from the list of followed users by ID
+    + location (optional, array, `[-122.331, 47.61]`) ... Array of `[longitude, latitude]` location
+
++ Request
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
+
++ Response 200
+
+    [User][]
+
+### Delete a user [DELETE]
+Delete a user by ID.
+
++ Request
+
+    + Headers
+
+            Authorization: bearer 5262d64b892e8d4341000001
+
++ Response 204
