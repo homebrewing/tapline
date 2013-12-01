@@ -23,7 +23,9 @@ Tapline is split into two logical components. You can use just one of these, or 
 
 ## Examples
 
+ * [Draw an SRM color chart](http://jsfiddle.net/danielgtaylor/7N9T6/)
  * [Display a list of users](http://jsfiddle.net/danielgtaylor/vn3Rt/)
+ * [Display a list of recipes](http://jsfiddle.net/danielgtaylor/9u7je/)
 
 ## Formats
 JSON is the primary format used within Tapline, but for the HTTP `GET` request method query arguments are typically used. For example, to get a list of recipes:
