@@ -57,6 +57,8 @@ describe '/account', ->
                 .expect 200, done
 
         it 'Should log in a user and redirect', (done) ->
+            @timeout 5000
+
             request(app)
                 .post('/account/login')
                 .send(username: authInfo.user.name, password: 'abc123', next: '/account')
@@ -70,6 +72,8 @@ describe '/account', ->
 
     describe 'OAuth web flow', ->
         it 'Should render a grant request page', (done) ->
+            @timeout 5000
+
             request(app)
                 .get('/account/authorize')
                 .query(client_id: authInfo.client.id, scope: 'user,recipe', state: 'test')

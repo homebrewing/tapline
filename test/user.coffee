@@ -29,6 +29,8 @@ describe '/v1/users', ->
             db.close done
 
     describe 'Register new user', ->
+        @timeout 5000
+
         it 'Should return JSON on success', (done) ->
             request(app)
                 .post('/v1/users')

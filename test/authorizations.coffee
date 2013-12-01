@@ -13,6 +13,8 @@ authInfo = {}
 newAuthId = null
 
 describe '/v1/authorizations', ->
+    @timeout 5000
+
     before (done) ->
         db.connect util.testDb, (err) ->
             if err then return done(err)
