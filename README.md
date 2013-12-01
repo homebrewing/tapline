@@ -1,7 +1,7 @@
 Tapline
 =======
 
-[![Dependency Status](https://gemnasium.com/homebrewing/tapline.png)](https://gemnasium.com/homebrewing/tapline) [![Build Status](https://travis-ci.org/homebrewing/tapline.png)](https://travis-ci.org/homebrewing/tapline) [![Coverage Status](https://coveralls.io/repos/homebrewing/tapline/badge.png?branch=master)](https://coveralls.io/r/homebrewing/tapline?branch=master) [![NPM version](https://badge.fury.io/js/tapline.png)](http://badge.fury.io/js/tapline)
+[![Dependency Status](https://david-dm.org/homebrewing/tapline.png)](https://david-dm.org/homebrewing/tapline) [![Build Status](https://travis-ci.org/homebrewing/tapline.png)](https://travis-ci.org/homebrewing/tapline) [![Coverage Status](https://coveralls.io/repos/homebrewing/tapline/badge.png?branch=master)](https://coveralls.io/r/homebrewing/tapline?branch=master) [![NPM version](https://badge.fury.io/js/tapline.png)](http://badge.fury.io/js/tapline)
 
 A beer, wine, and mead homebrew API server based on [Brauhaus](https://github.com/homebrewing/brauhausjs). Features include:
 

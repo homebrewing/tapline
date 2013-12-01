@@ -81,7 +81,7 @@
     "marked": "~0.2.9",
     "jade": "~0.35",
     "passport-local": "~0.1.6",
-    "lodash": "~2.3.0",
+    "lodash": "~2.4.0",
     "gravatar": "~1.0.6",
     "passport-facebook": "~1.0.1",
     "passport-google-oauth": "~0.1.5",
@@ -95,9 +95,9 @@
   },
   "devDependencies": {
     "coffee-script": ">=1.6 <2",
-    "coffeelint": ">=0.5.6 <1",
+    "coffeelint": "~1.0.2",
     "mocha": ">=1.8 <2",
-    "supertest": "~0.7.0",
+    "supertest": "~0.8.2",
     "sinon": "~1.7.3",
     "grunt-contrib-coffee": "~0.7.0",
     "grunt": "~0.4.1",
@@ -105,7 +105,7 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-coffeelint": "0.0.7",
     "grunt-mocha-cov": "0.0.7",
-    "grunt-shell": "~0.5.0"
+    "grunt-shell": "~0.6.1"
   },
   "engines": {
     "node": ">=0.8"
