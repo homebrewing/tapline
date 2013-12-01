@@ -148,6 +148,7 @@ recipeController.serialize = (recipe, user, detail) ->
             color: r.color
             colorEbc: brauhaus.srmToEbc r.color
             colorLovibond: brauhaus.srmToLovibond r.color
+            colorRgb: brauhaus.srmToRgb r.color
             fg: r.fg
             fgPlato: r.fgPlato
             ibu: r.ibu
