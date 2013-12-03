@@ -3,6 +3,9 @@ mongoose = require 'mongoose'
 util = require '../util'
 
 RecipeSchema = new mongoose.Schema
+    parent:
+        type: mongoose.Schema.Types.ObjectId
+        ref: 'Recipe'
     user:
         type: mongoose.Schema.Types.ObjectId
         required: true
@@ -40,6 +43,6 @@ RecipeSchema = new mongoose.Schema
 RecipeSchema.index {user: 1, slug: 1}, {unique: true}
 
 # Cover common queries
-RecipeSchema.index {id: 1, user: 1, name: 1, created: -1, slug: 1, private: 1, grade: -1}
+RecipeSchema.index {id: 1, parent: 1, user: 1, name: 1, created: -1, slug: 1, private: 1, grade: -1}
 
 module.exports = mongoose.model 'Recipe', RecipeSchema

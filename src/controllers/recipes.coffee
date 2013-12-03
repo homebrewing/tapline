@@ -1,4 +1,5 @@
 _ = require 'lodash'
+async = require 'async'
 brauhaus = require 'brauhaus'
 jsonGate = require 'json-gate'
 queue = require '../queue'
@@ -18,6 +19,12 @@ listSchema = jsonGate.createSchema
     type: 'object'
     properties:
         ids:
+            type: 'array'
+            minItems: 1
+            maxItems: 60
+            items:
+                type: 'string'
+        parentIds:
             type: 'array'
             minItems: 1
             maxItems: 60
@@ -49,6 +56,9 @@ listSchema = jsonGate.createSchema
         detail:
             type: 'boolean'
             default: false
+        populateParent:
+            type: 'boolean'
+            default: false
         showPrivate:
             type: 'boolean'
             default: false
@@ -58,6 +68,8 @@ listSchema = jsonGate.createSchema
 creationSchema = jsonGate.createSchema
     type: 'object'
     properties:
+        parent:
+            type: 'string'
         private:
             type: 'boolean'
             default: false
@@ -66,6 +78,9 @@ creationSchema = jsonGate.createSchema
             default: false
         recipe:
             type: 'any'
+        populateParent:
+            type: 'boolean'
+            default: false
 
 updateSchema = jsonGate.createSchema
     type: 'object'
@@ -73,6 +88,8 @@ updateSchema = jsonGate.createSchema
         id:
             type: 'string'
             required: true
+        parent:
+            type: 'string'
         private:
             type: 'boolean'
         detail:
@@ -80,6 +97,9 @@ updateSchema = jsonGate.createSchema
             default: false
         recipe:
             type: 'any'
+        populateParent:
+            type: 'boolean'
+            default: false
 
 deleteSchema = jsonGate.createSchema
     type: 'object'
@@ -97,7 +117,7 @@ incrementSlug = (slug) ->
         slug.replace /\d+$/, (n) -> ++n
 
 # Serialize a recipe for a JSON response
-recipeController.serialize = (recipe, user, detail) ->
+recipeController.serialize = (recipe, user, detail, populateParent, done) ->
     r = new brauhaus.Recipe(recipe.data)
 
     recipeData =
@@ -159,8 +179,11 @@ recipeController.serialize = (recipe, user, detail) ->
             timeline: r.timeline()
             timelineImperial: r.timeline false
 
+    parentData = recipe.parent or null
+
     serialized =
         id: recipe.id
+        parent: parentData
         user:
             id: user.id
             name: user.name
@@ -169,6 +192,50 @@ recipeController.serialize = (recipe, user, detail) ->
         created: recipe.created
         private: recipe.private
         data: recipeData
+
+    if populateParent
+        select = '_id user slug name description'
+        if detail
+            select += ' color og fg ibu abv'
+
+        # Unfortunately we need to call populate multiple times to fill
+        # in both the parent recipe and its user info. Since we are
+        # querying directly by ObjectId it should be fast and use
+        # an index. Considering the infrequency of username and profile
+        # image changes it may be a good idea to denormalize this data
+        # in the future. <- TODO
+        recipe
+            .populate(path: 'parent', select: select)
+            .populate (err, recipeWithParent) ->
+                recipeWithParent
+                    .populate(path: 'parent.user', select: '_id name image', model: 'User')
+                    .populate (err, recipeWithParentUser) ->
+                        p = recipeWithParentUser.parent
+
+                        serialized.parent =
+                            id: p.id
+                            user:
+                                id: p.user.id
+                                name: p.user.name
+                                image: p.user.image
+                            slug: p.slug
+                            name: p.name
+                            description: p.description
+
+                        if detail
+                            _.extend serialized.parent,
+                                color: p.color
+                                colorEbc: brauhaus.srmToEbc p.color
+                                colorLovibond: brauhaus.srmToLovibond p.color
+                                colorRgb: brauhaus.srmToRgb p.color
+                                og: p.og
+                                fg: p.fg
+                                ibu: p.ibu
+                                abv: p.abv
+
+                        done null, serialized
+    else
+        done null, serialized
 
 recipeController.list = (req, res) ->
     if req.params.id
@@ -181,6 +248,7 @@ recipeController.list = (req, res) ->
         offset: Number
         limit: Number
         detail: Boolean
+        populateParent: Boolean
         showPrivate: Boolean
 
     util.queryConvert req.query, conversions, (err) ->
@@ -202,6 +270,9 @@ recipeController.list = (req, res) ->
             if data.ids then select._id =
                 $in: data.ids
 
+            if data.parentIds then select.parent =
+                $in: data.parentIds
+
             if data.userIds then select.user =
                 $in: data.userIds
 
@@ -217,10 +288,12 @@ recipeController.list = (req, res) ->
             query.skip(data.offset).limit(data.limit).exec (err, recipes) ->
                 if err then return res.send(500, err.toString())
 
-                responses = for recipe in recipes
-                    recipeController.serialize recipe, recipe.user, data.detail
-
-                res.json responses
+                async.map recipes,
+                    (recipe, done) ->
+                        recipeController.serialize recipe, recipe.user, data.detail, data.populateParent, done
+                    (err, result) ->
+                        if err then return res.send(500, err.toString())
+                        res.json result
 
 recipeController.create = (req, res) ->
     creationSchema.validate req.body, (err, data) ->
@@ -233,6 +306,7 @@ recipeController.create = (req, res) ->
         recipeData.calculate()
 
         recipe = new Recipe
+            parent: data.parent
             user: req.user._id
             name: recipeData.name
             slug: slug(recipeData.name).toLowerCase()
@@ -269,7 +343,9 @@ recipeController.create = (req, res) ->
 
             action.save()
 
-            res.json recipeController.serialize(saved, req.user, data.detail)
+            recipeController.serialize saved, req.user, data.detail, data.populateParent, (err, serialized) ->
+                if err then return res.send(500, err.toString())
+                res.json serialized
 
         recipe.save saveHandler
 
@@ -281,6 +357,7 @@ recipeController.update = (req, res) ->
         update =
             modified: Date.now()
 
+        if data.parent then update.parent = data.parent
         if data.private then update.private = data.private
         if data.recipe
             recipe = new brauhaus.Recipe(data.recipe)
@@ -353,7 +430,9 @@ recipeController.update = (req, res) ->
 
                 queue.put 'recipe-updated', workerData
 
-                res.json recipeController.serialize(saved, req.user, data.detail)
+                recipeController.serialize saved, req.user, data.detail, data.populateParent, (err, serialized) ->
+                    if err then return res.send(500, err.toString())
+                    res.json serialized
 
             Recipe.findByIdAndUpdate data.id, update, updateHandler
 

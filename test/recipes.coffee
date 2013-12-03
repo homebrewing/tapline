@@ -54,13 +54,14 @@ describe '/v1/recipes', ->
         it 'Should successfully clone a recipe with a unique slug', (done) ->
             request(app)
                 .post('/v1/recipes')
-                .send(private: false, recipe: {name: 'Test recipe', fermentables: [{name: 'Pale malt', weight: 3.2}]})
+                .send(parent: recipeId, private: false, populateParent: true, detail: true, recipe: {name: 'Test recipe', fermentables: [{name: 'Pale malt', weight: 3.2}]})
                 .set('Authorization', "Bearer #{authInfo.auth.token}")
                 .expect(200)
                 .end (err, res) ->
                     if err then return done(err)
 
                     assert.equal 'test-recipe-1', res.body.slug
+                    assert.equal recipeId, res.body.parent.id
 
                     done()
 

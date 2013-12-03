@@ -88,7 +88,8 @@
     "slug": "~0.4.0",
     "connect-mongo": "~0.4.0",
     "brauhaus-diff": "~1.0.0",
-    "fivebeans": "~1.0.3"
+    "fivebeans": "~1.0.3",
+    "async": "~0.2.9"
   },
   "optionalDependencies": {
     "bcrypt": "~0.7.6"

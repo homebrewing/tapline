@@ -395,7 +395,8 @@ A collection of public homebrew recipes.
 + Parameters
 
     + ids (optional, string, `100,102,105`) ... List of recipe IDs
-    + userIds (optional, string, `200,201,204`) ... List of recipe owner user IDs
+    + parentIds (optional, string, `200,201,203`) ... List of parent recipe IDs
+    + userIds (optional, string, `300,302,304`) ... List of recipe owner user IDs
     + slugs (optional, string, `test-recipe,hefeweizen`) ... List of recipe slugs to find in conjunction with `userIds`
     + offset = `0` (optional, integer, `0`) ... Number of recipes to skip
     + limit = `20` (optional, integer, `30`) ... Number of recipes returned
@@ -408,6 +409,7 @@ A collection of public homebrew recipes.
             + `-name`
 
     + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
+    + populateParent = `false` (optional, boolean, `true`) ... Whether to populate the parent with recipe and user info or leave it as an ID
 
 + Model
 A list of recipes
@@ -481,6 +483,16 @@ A list of recipes
                         ]
                     }, 
                     "id": "5275359f031555931a000005", 
+                    "parent": {
+                        "id": "527ade27f2ef089293000001", 
+                        "name": "Simple Beer", 
+                        "slug": "simple-beer", 
+                        "user": {
+                            "id": "51de54131084ffeef8000001", 
+                            "image": "http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&d=retro", 
+                            "name": "daniel"
+                        }
+                    },
                     "private": false, 
                     "slug": "another-beer-2", 
                     "user": {
@@ -551,6 +563,7 @@ A list of recipes
                         ]
                     }, 
                     "id": "5269857b7011ba8186000001", 
+                    "parent": null,
                     "private": false, 
                     "slug": "hefeweizen", 
                     "user": {
@@ -1020,6 +1033,7 @@ Get a list of recipes with the given filtering and sorting parameters. By defaul
             + `-name`
 
     + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
+    + populateParent = `false` (optional, boolean, `true`) ... Whether to populate the parent with recipe and user info or leave it as an ID
     + private = `false` (optional, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
 
 + Request
@@ -1039,6 +1053,7 @@ Create a new recipe. If `private` is true, then this recipe will not show up in 
 
     + private = `false` (optional, boolean, `true`) ... Make this recipe private
     + detail = `false` (optional, boolean, `true`) ... Return calculated recipe details
+    + populateParent = `false` (optional, boolean, `true`) ... Whether to populate the parent with recipe and user info or leave it as an ID
     + recipe (required, object, `{...}`) ... A JSON representation of a recipe
 
 + Request (application/json)
@@ -1129,6 +1144,16 @@ Create a new recipe. If `private` is true, then this recipe will not show up in 
             ]
         }, 
         "id": "5275359f031555931a000005", 
+        "parent": {
+            "id": "527ade27f2ef089293000001", 
+            "name": "Simple Beer", 
+            "slug": "simple-beer", 
+            "user": {
+                "id": "51de54131084ffeef8000001", 
+                "image": "http://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?s=SIZE&d=retro", 
+                "name": "daniel"
+            }
+        },
         "private": false, 
         "slug": "another-beer-2", 
         "user": {
@@ -1211,6 +1236,7 @@ A single recipe that is referenced by its ID.
                 ]
             }, 
             "id": "5275359f031555931a000005", 
+            "parent": null,
             "private": false, 
             "slug": "another-beer-2", 
             "user": {
@@ -1227,6 +1253,7 @@ Get a single recipe by its ID. If the recipe is private, then `private` must be 
 
     + id (required, string, `100`) ... Recipe ID
     + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
+    + populateParent = `false` (optional, boolean, `true`) ... Whether to populate the parent with recipe and user info or leave it as an ID
     + private = `false` (optional, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
 
 + Request
@@ -1246,6 +1273,7 @@ Update a recipe by its ID.
 
     + id (required, string, `100`) ... Recipe ID
     + detail = `false` (optional, boolean, `true`) ... Whether to show detailed info
+    + populateParent = `false` (optional, boolean, `true`) ... Whether to populate the parent with recipe and user info or leave it as an ID
     + private = `false` (optional, boolean, `true`) ... If true, return private recipes of the requesting user. By default only return public recipes.
     + recipe (required, object, `{...}`) ... A JSON representation of a recipe
 
