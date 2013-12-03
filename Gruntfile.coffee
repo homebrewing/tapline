@@ -90,6 +90,9 @@ module.exports = (grunt) ->
             processes[name].stdout.on 'data', (buffer) ->
                 grunt.log.write "[#{name}] > ".cyan + String(buffer)
 
+            processes[name].stderr.on 'data', (buffer) ->
+                grunt.log.write "[#{name}] > ".red + String(buffer)
+
             grunt.log.write '>> '.green + "Started #{name}"
 
     # Cleanup any spawned processes on Ctrl-C
