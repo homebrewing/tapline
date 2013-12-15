@@ -67,7 +67,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "brauhaus": "~1.0.0",
+    "brauhaus": "~1.1.0",
     "brauhaus-beerxml": "~1.0.0",
     "mongoose": "3.8.x",
     "express": "~3.4.4",
