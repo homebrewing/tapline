@@ -1,6 +1,7 @@
 config = require './config'
 ensureLogin = require './middleware/ensure-login'
 express = require 'express'
+session = require 'express-session'
 log = require './log'
 passport = require 'passport'
 path = require 'path'
@@ -49,7 +50,7 @@ app.configure ->
     app.use require('./middleware/log')
     # Web browser specific route middleware
     app.use '/account', express.cookieParser()
-    app.use '/account', express.session
+    app.use '/account', session
         secret: config.cookieSecret
         store: new MongoStore
             db: 'tapline'
