@@ -73,6 +73,7 @@
     "brauhaus-beerxml": "~1.0.0",
     "brauhaus-diff": "~1.0.0",
     "connect-mongo": "~2.0.3",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "fivebeans": "~1.5.0",
@@ -81,6 +82,7 @@
     "json-gate": "~0.8.21",
     "lodash": "~4.17.11",
     "marked": "~0.5.2",
+    "method-override": "^3.0.0",
     "mongoose": "5.4.x",
     "optimist": "~0.6.0",
     "passport": "~0.4.0",
@@ -89,6 +91,7 @@
     "passport-http": "~0.3.0",
     "passport-http-bearer": "~1.0.1",
     "passport-local": "~1.0.0",
+    "response-time": "^2.3.2",
     "slug": "~0.9.3",
     "winston": "~3.1.0"
   },
