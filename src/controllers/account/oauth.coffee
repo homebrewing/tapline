@@ -45,8 +45,8 @@ oauthController.getAuthorization = (req, res) ->
     scopes = (req.query.scope or '').split ','
 
     Grant.findOne userId: req.user.id, clientId: req.query.client_id, (err, grant) ->
-        if err and err.name is 'CastError' then return res.send(404, 'Cannot find client')
-        if err then return res.send(500, err.toString())
+        if err and err.name is 'CastError' then return res.status(404).send('Cannot find client')
+        if err then return res.status(500).send(err.toString())
 
         # TODO: Compare grant scopes - user may need to reauthorize new scopes
 
@@ -60,16 +60,16 @@ oauthController.getAuthorization = (req, res) ->
                     Client.findOne _id: req.query.client_id, (err, client) ->
                         if redirectAllowed req.query.redirect_uri, client
                             authFromGrant grant, (err, auth) ->
-                                if err then return res.send 500, err.toString()
+                                if err then return res.status(500).send(err.toString())
                                 res.redirect "#{req.query.redirect_uri}#access_token:#{auth.token}"
                         else
-                            res.send 400, "Redirect not allowed: #{req.query.redirect_uri}"
+                            res.status(400).send("Redirect not allowed: #{req.query.redirect_uri}")
                 else
-                    return res.send 400, "Invalid type #{req.query.type}"
+                    return res.status(400).send("Invalid type #{req.query.type}")
         else
             Client.findOne _id: req.query.client_id, (err, client) ->
-                if err then return res.send(500, err.toString())
-                if not client then return res.send(404, 'Cannot find client')
+                if err then return res.status(500).send(err.toString())
+                if not client then return res.status(404).send('Cannot find client')
 
                 # If this is a trusted client then create the grant and authorization
                 # without asking the user. This lets official apps magically work.
@@ -80,7 +80,7 @@ oauthController.getAuthorization = (req, res) ->
                         scopes: scopes
 
                     grant.save (err) ->
-                        if err then return res.send(500, err.toString())
+                        if err then return res.status(500).send(err.toString())
 
                         switch req.query.type
                             when 'web_server'
@@ -88,12 +88,12 @@ oauthController.getAuthorization = (req, res) ->
                             when 'token'
                                 if redirectAllowed req.query.redirect_uri, client
                                     authFromGrant grant, (err, auth) ->
-                                        if err then return res.send 500, err.toString()
+                                        if err then return res.status(500).send(err.toString())
                                         res.redirect "#{req.query.redirect_uri}#access_token:#{auth.token}"
                                 else
-                                    res.send 400, "Redirect not allowed: #{req.query.redirect_uri}"
+                                    res.status(400).send("Redirect not allowed: #{req.query.redirect_uri}")
                             else
-                                return res.send 400, "Invalid type #{req.query.type}"
+                                return res.status(400).send("Invalid type #{req.query.type}")
                 else
                     scopeMap =
                         'Public user account information': [
@@ -140,8 +140,8 @@ oauthController.getAuthorization = (req, res) ->
 oauthController.postAuthorization = (req, res) ->
     # TODO: Check parameters
     Client.findOne _id: req.body.clientId, (err, client) ->
-        if err then return res.send(500, err.toString())
-        if not client then return res.send(404, 'Cannot find client')
+        if err then return res.status(500).send(err.toString())
+        if not client then return res.status(404).send('Cannot find client')
 
         grant = new Grant
             clientId: client.id
@@ -149,7 +149,7 @@ oauthController.postAuthorization = (req, res) ->
             scopes: req.body.scopes.split ','
 
         grant.save (err, grant) ->
-            if err then return res.send(500, err.toString())
+            if err then return res.status(500).send(err.toString())
 
             switch req.body.type
                 when 'web_server'
@@ -157,36 +157,36 @@ oauthController.postAuthorization = (req, res) ->
                 when 'token'
                     if redirectAllowed req.body.redirectUri, client
                         authFromGrant grant, (err, auth) ->
-                            if err then return res.send 500, err.toString()
+                            if err then return res.status(500).send(err.toString())
                             res.redirect "#{req.body.redirectUri}#access_token:#{auth.token}"
                     else
-                        res.send 400, "Redirect not allowed: #{req.body.redirectUri}"
+                        res.status(400).send("Redirect not allowed: #{req.body.redirectUri}")
                 else
-                    return res.send 400, "Invalid type #{req.body.type}"
+                    return res.status(400).send("Invalid type #{req.body.type}")
 
 oauthController.postAccessToken = (req, res) ->
     # TODO: Check parameters
 
     # Get and verify the client is who he says he is
     Client.findOne _id: req.body.client_id, (err, client) ->
-        if err and err.name is 'CastError' then return res.send(404, 'Cannot find client')
-        if err then return res.send(500, err.toString())
-        if not client then return res.send(404, 'Cannot find client')
+        if err and err.name is 'CastError' then return res.status(404).send('Cannot find client')
+        if err then return res.status(500).send(err.toString())
+        if not client then return res.status(404).send('Cannot find client')
 
         # Valid requests must include the client secret
         if client.secret isnt req.body.client_secret
-            return res.send(401, 'Invalid client secret')
+            return res.status(401).send('Invalid client secret')
 
         # Make sure the grant exists and is valid
         Grant.findOne code: req.body.code, (err, grant) ->
-            if err then return res.send(500, err.toString())
-            if not grant then return res.send(404, 'Cannot find grant')
+            if err then return res.status(500).send(err.toString())
+            if not grant then return res.status(404).send('Cannot find grant')
 
             if not grant.clientId.equals(client.id)
-                return res.send(401, 'Grant does not match client ID')
+                return res.status(401).send('Grant does not match client ID')
 
             authFromGrant grant, (err, auth) ->
-                if err then return res.send 500, err.toString()
+                if err then return res.status(500).send(err.toString())
 
                 res.json
                     access_token: auth.token

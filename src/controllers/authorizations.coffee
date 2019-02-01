@@ -81,10 +81,10 @@ getClient = (id, secret, done) ->
 
 authController.create = (req, res) ->
     createSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         getClient data.clientId, data.clientSecret, (err, client) ->
-            if err then return res.send(client, err)
+            if err then return res.status(client).send(err)
 
             auth = new Authorization
                 userId: req.user.id
@@ -92,39 +92,39 @@ authController.create = (req, res) ->
                 scopes: data.scopes
 
             auth.save (err, auth) ->
-                if err then return res.send(500, err.toString())
+                if err then return res.status(500).send(err.toString())
 
-                res.json 201, auth
+                res.status(201).json(auth)
 
 authController.list = (req, res) ->
     listSchema.validate req.query, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         getClient data.clientId, data.clientSecret, (err, client) ->
-            if err then return res.send(client, err)
+            if err then return res.status(client).send(err)
 
             params =
                 clientId: client.id
                 userId: req.user.id
 
             Authorization.find params, (err, auths) ->
-                if err then return res.send(500, err.toString())
+                if err then return res.status(500).send(err.toString())
 
                 res.json auths
 
 authController.update = (req, res) ->
     updateSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         count = [data.scopes, data.addScopes, data.removeScopes].filter((x) -> x).length
 
         if count is 0
-            return res.send(400, 'Must supply at least one of scopes, addScopes or removeScopes')
+            return res.status(400).send('Must supply at least one of scopes, addScopes or removeScopes')
         else if count > 1
-            return res.send(400, 'Only one of scopes, addScopes or removeScopes can be given')
+            return res.status(400).send('Only one of scopes, addScopes or removeScopes can be given')
 
         getClient data.clientId, data.clientSecret, (err, client) ->
-            if err then return res.send(client, err)
+            if err then return res.status(client).send(err)
 
             query =
                 _id: req.params.id
@@ -138,24 +138,24 @@ authController.update = (req, res) ->
 
             # Find and update an entry
             Authorization.findOneAndUpdate query, update, (err, auth) ->
-                if err then return res.send(500, err.toString())
-                if not auth then return res.send(404, 'Authorization not found')
+                if err then return res.status(500).send(err.toString())
+                if not auth then return res.status(404).send('Authorization not found')
 
                 res.json auth
 
 authController.delete = (req, res) ->
     deleteSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         getClient data.clientId, data.clientSecret, (err, client) ->
-            if err then return res.send(client, err.toString())
+            if err then return res.status(client).send(err.toString())
 
             query =
                 _id: req.params.id
                 userId: req.user.id
 
             Authorization.findOneAndRemove query, (err, auth) ->
-                if err then return res.send(500, err.toString())
-                if not auth then return res.send(404, 'Authorization not found')
+                if err then return res.status(500).send(err.toString())
+                if not auth then return res.status(404).send('Authorization not found')
 
-                res.send 204, null
+                res.status(204).send(null)

@@ -1,11 +1,15 @@
 config = require './config'
 ensureLogin = require './middleware/ensure-login'
 express = require 'express'
+session = require 'express-session'
+responseTime = require 'response-time'
+methodOverride = require 'method-override'
+cookieParser = require 'cookie-parser'
 log = require './log'
 passport = require 'passport'
 path = require 'path'
 
-MongoStore = require('connect-mongo')(express)
+MongoStore = require('connect-mongo')(session)
 
 # Authentication strategies
 {BasicStrategy} = require 'passport-http'
@@ -36,28 +40,32 @@ oauthController = require './controllers/account/oauth'
 # Setup HTTP server
 # =================
 app = exports.app = express()
-app.configure ->
-    app.disable 'x-powered-by'
-    app.set 'views', path.normalize(path.join("#{__dirname}", '..', 'views'))
-    app.set 'view engine', 'jade'
-    app.use '/v1', require('./middleware/cors')
-    app.use express.responseTime()
-    app.use express.urlencoded()
-    app.use express.json()
-    app.use express.methodOverride()
-    app.use require('./middleware/requestId')
-    app.use require('./middleware/log')
-    # Web browser specific route middleware
-    app.use '/account', express.cookieParser()
-    app.use '/account', express.session
-        secret: config.cookieSecret
-        store: new MongoStore
-            db: 'tapline'
-    app.use passport.initialize()
-    app.use '/account', passport.session()
-    app.use '/account', require('./middleware/user')
-    app.use app.router
-    app.use express.static(path.normalize(path.join("#{__dirname}", '..', 'public')))
+app.disable 'x-powered-by'
+app.set 'views', path.normalize(path.join("#{__dirname}", '..', 'views'))
+app.set 'view engine', 'jade'
+app.use '/v1', require('./middleware/cors')
+app.use responseTime()
+app.use express.urlencoded()
+app.use express.json()
+app.use methodOverride()
+app.use require('./middleware/requestId')
+app.use require('./middleware/log')
+# Web browser specific route middleware
+app.use '/account', cookieParser()
+app.use '/account', session
+    extended: true
+    resave: true
+    saveUninitialized: true
+    secret: config.cookieSecret
+    store: new MongoStore
+        url: 'mongodb://localhost/tapline'
+        db: 'tapline'
+        useNewUrlParser: true
+
+app.use passport.initialize()
+app.use '/account', passport.session()
+app.use '/account', require('./middleware/user')
+app.use express.static(path.normalize(path.join("#{__dirname}", '..', 'public')))
 
 # =====================
 # Setup Auth Strategies

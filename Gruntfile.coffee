@@ -14,7 +14,7 @@ module.exports = (grunt) ->
             'dbdir':
                 command: 'mkdir -p db'
             'drop-test-db':
-                command: 'mongo tapline_test --exec "db.dropDatabase()"'
+                command: 'mongo tapline_test --eval "db.dropDatabase()"'
         coffeelint:
             options:
                 indentation:

@@ -134,10 +134,10 @@ userController.list = (req, res) ->
         fromLat: Number
 
     util.queryConvert req.query, conversions, (err) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         listSchema.validate req.query, (err, data) ->
-            if err then return res.send(400, err.toString())
+            if err then return res.status(400).send(err.toString())
 
             select = {}
 
@@ -169,7 +169,7 @@ userController.list = (req, res) ->
                 query = query.sort(data.sort)
 
             query.skip(data.offset).limit(data.limit).exec (err, users) ->
-                if err then return res.send(500, err.toString())
+                if err then return res.status(500).send(err.toString())
                 res.json users
 
 userController.profile = (req, res) ->
@@ -185,7 +185,7 @@ userController.profile = (req, res) ->
 
 userController.create = (req, res) ->
     creationSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         u = new User
             name: data.name
@@ -195,11 +195,11 @@ userController.create = (req, res) ->
             location: data.location
 
         u.setPassword data.password, (err) ->
-            if err then return res.send(500, err.toString())
+            if err then return res.status(500).send(err.toString())
             u.save (err, saved) ->
                 if err and err.code is util.ERROR_DB_DUPE
-                    return res.send 400, "User name #{data.name} already taken!"
-                if err then return res.send(500, err.toString())
+                    return res.status(400).send("User name #{data.name} already taken!")
+                if err then return res.status(500).send(err.toString())
 
                 action = new Action
                     user: saved._id
@@ -210,20 +210,20 @@ userController.create = (req, res) ->
 
                 action.save()
 
-                res.json 201, saved
+                res.status(201).json(saved)
 
 userController.update = (req, res) ->
     params = util.extend {}, req.params, req.body
     updateSchema.validate params, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         if req.user.id isnt data.id
-            return res.send 401, "Token does not match user ID"
+            return res.status(401).send("Token does not match user ID")
 
         count = [data.following, data.addFollowing, data.removeFollowing].filter((x) -> x).length
 
         if count > 1
-            return res.send(400, 'Only one of following, addFollowing or removeFollowing can be given')
+            return res.status(400).send('Only one of following, addFollowing or removeFollowing can be given')
 
         # Update the user with a find-and-update. This is called
         # below based on whether a password needs to be updated.
@@ -244,9 +244,9 @@ userController.update = (req, res) ->
 
             User.findByIdAndUpdate data.id, update, (err, saved) ->
                 if err and err.code is util.ERROR_DB_DUPE
-                    return res.send 400, "User name #{data.name} already taken!"
-                if err then return res.send(500, err.toString())
-                if not saved then return res.send(404, "User not found")
+                    return res.status(400).send("User name #{data.name} already taken!")
+                if err then return res.status(500).send(err.toString())
+                if not saved then return res.status(404).send("User not found")
 
                 # Create user-followed actions if new users were followed
                 for added in _.without.apply(this, [saved.following].concat(req.user.following))
@@ -275,14 +275,14 @@ userController.update = (req, res) ->
 userController.delete = (req, res) ->
     params = util.extend {}, req.params
     deleteSchema.validate params, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         if req.user.id isnt data.id
-            return res.send 401, "Token does not match user ID"
+            return res.status(401).send("Token does not match user ID")
 
         User.findByIdAndRemove data.id, (err) ->
-            if err then return res.send(500, err.toString())
+            if err then return res.status(500).send(err.toString())
 
             # TODO: Decide if this should remove actions/recipes/brews/etc
 
-            res.send 204, null
+            res.status(204).send(null)
