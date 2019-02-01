@@ -56,11 +56,12 @@ app.use '/account', session
     extended: true
     resave: true
     saveUninitialized: true
-    useNewUrlParser: true
     secret: config.cookieSecret
     store: new MongoStore
         url: 'mongodb://localhost/tapline'
         db: 'tapline'
+        useNewUrlParser: true
+
 app.use passport.initialize()
 app.use '/account', passport.session()
 app.use '/account', require('./middleware/user')
