@@ -53,6 +53,10 @@ app.use require('./middleware/log')
 # Web browser specific route middleware
 app.use '/account', cookieParser()
 app.use '/account', session
+    extended: true
+    resave: true
+    saveUninitialized: true
+    useNewUrlParser: true
     secret: config.cookieSecret
     store: new MongoStore
         url: 'mongodb://localhost/tapline'

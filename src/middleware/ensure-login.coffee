@@ -6,4 +6,4 @@ module.exports = (req, res, next) ->
     if req.method is 'GET'
         res.redirect "/account/login?next=#{encodeURIComponent(req.url)}"
     else
-        res.send(403, 'User must be logged in...')
+        res.status(403).send('User must be logged in...')

@@ -22,7 +22,7 @@ recipeSchema = jsonGate.createSchema
 # Convert a passed-in recipe from and to JSON / BeerXML
 recipeController.convert = (req, res) ->
     recipeSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         recipes = util.getRecipeList data.format, data.recipes
 

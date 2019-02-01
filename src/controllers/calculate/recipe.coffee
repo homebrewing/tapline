@@ -21,10 +21,10 @@ recipeSchema = jsonGate.createSchema
 # Calculate important values about a recipe like OG, FG, IBU, ABV, etc
 recipeController.calculate = (req, res) ->
     recipeSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         recipes = util.getRecipeList data.format, data.recipes
-        
+
         responses = for recipe in recipes
             recipe.calculate()
             timeline = recipe.timeline(data.siUnits)

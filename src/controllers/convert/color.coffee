@@ -30,7 +30,7 @@ convertSchema = jsonGate.createSchema
 # following: SRM, EBC, Lovibond, color name, RGB, or CSS string
 colorController.convert = (req, res) ->
     convertSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         srm = switch data.format
             when 'srm'
@@ -49,7 +49,7 @@ colorController.convert = (req, res) ->
             when 'css' then (brauhaus.srmToCss value for value in srm)
 
         if output is undefined
-            return res.send(400, "Invalid output format '#{data.outputFormat}!")
+            return res.status(400).send("Invalid output format '#{data.outputFormat}!")
 
         req.info "Converted color(s) from #{data.format} to #{data.outputFormat}"
 

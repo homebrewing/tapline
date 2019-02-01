@@ -28,7 +28,7 @@ durationSchema = jsonGate.createSchema
 # representation into either a number of minutes or a display duration.
 durationConvertController.convert = (req, res) ->
     durationSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         values = (brauhaus.parseDuration value for value in data.values)
 

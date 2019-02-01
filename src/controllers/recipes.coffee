@@ -252,10 +252,10 @@ recipeController.list = (req, res) ->
         showPrivate: Boolean
 
     util.queryConvert req.query, conversions, (err) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         listSchema.validate req.query, (err, data) ->
-            if err then return res.send(400, err.toString())
+            if err then return res.status(400).send(err.toString())
 
             select =
                 $or: [
@@ -264,7 +264,7 @@ recipeController.list = (req, res) ->
 
             if data.showPrivate
                 if not req.user or req.authInfo?.scopes?.indexOf('private') is -1
-                    return res.send(401, 'Scope "private" required to view private recipes!')
+                    return res.status(401).send('Scope "private" required to view private recipes!')
                 select.$or.push {private: true, user: req.user._id}
 
             if data.ids then select._id =
@@ -286,18 +286,18 @@ recipeController.list = (req, res) ->
             query = query.populate 'user', '_id name image'
 
             query.skip(data.offset).limit(data.limit).exec (err, recipes) ->
-                if err then return res.send(500, err.toString())
+                if err then return res.status(500).send(err.toString())
 
                 async.map recipes,
                     (recipe, done) ->
                         recipeController.serialize recipe, recipe.user, data.detail, data.populateParent, done
                     (err, result) ->
-                        if err then return res.send(500, err.toString())
+                        if err then return res.status(500).send(err.toString())
                         res.json result
 
 recipeController.create = (req, res) ->
     creationSchema.validate req.body, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         data.recipe.author ?= req.user.name
 
@@ -323,7 +323,7 @@ recipeController.create = (req, res) ->
                 recipe.slug = incrementSlug recipe.slug
                 return recipe.save saveHandler
 
-            if err then return res.send(500, err.toString())
+            if err then return res.status(500).send(err.toString())
 
             # Create user action
             action = new Action
@@ -344,7 +344,7 @@ recipeController.create = (req, res) ->
             action.save()
 
             recipeController.serialize saved, req.user, data.detail, data.populateParent, (err, serialized) ->
-                if err then return res.send(500, err.toString())
+                if err then return res.status(500).send(err.toString())
                 res.json serialized
 
         recipe.save saveHandler
@@ -352,7 +352,7 @@ recipeController.create = (req, res) ->
 recipeController.update = (req, res) ->
     params = _.extend {}, req.params, req.body
     updateSchema.validate params, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         update =
             modified: Date.now()
@@ -376,11 +376,11 @@ recipeController.update = (req, res) ->
             #req.info(require('util').inspect(update))
 
         Recipe.findById data.id, (err, original) ->
-            if err then return res.send(500, err.toString())
-            if not original then return res.send(404, 'Recipe not found')
+            if err then return res.status(500).send(err.toString())
+            if not original then return res.status(404).send('Recipe not found')
 
             if req.user.id.toString() isnt original.user.toString()
-                return res.send 401, "Recipe owner does not match user ID"
+                return res.status(401).send("Recipe owner does not match user ID")
 
             if data.recipe
                 # Generate a diff of the old vs. new recipe
@@ -411,7 +411,7 @@ recipeController.update = (req, res) ->
                     update.slug = incrementSlug update.slug
                     return Recipe.findByIdAndUpdate data.id, update, updateHandler
 
-                if err then return res.send(500, err.toString())
+                if err then return res.status(500).send(err.toString())
 
                 # Update existing actions
                 workerData =
@@ -431,7 +431,7 @@ recipeController.update = (req, res) ->
                 queue.put 'recipe-updated', workerData
 
                 recipeController.serialize saved, req.user, data.detail, data.populateParent, (err, serialized) ->
-                    if err then return res.send(500, err.toString())
+                    if err then return res.status(500).send(err.toString())
                     res.json serialized
 
             Recipe.findByIdAndUpdate data.id, update, updateHandler
@@ -439,15 +439,15 @@ recipeController.update = (req, res) ->
 recipeController.delete = (req, res) ->
     params = util.extend {}, req.params
     deleteSchema.validate params, (err, data) ->
-        if err then return res.send(400, err.toString())
+        if err then return res.status(400).send(err.toString())
 
         Recipe.findById data.id, (err, recipe) ->
-            if err then return res.send(500, err.toString())
+            if err then return res.status(500).send(err.toString())
 
             if req.user.id.toString() isnt recipe.user.toString()
-                return res.send 401, "Recipe owner does not match user ID"
+                return res.status(401).send 401, "Recipe owner does not match user ID"
 
             recipe.remove (err) ->
-                if err then return res.send(500, err.toString())
+                if err then return res.status(500).send(err.toString())
 
-                res.send 204, null
+                res.status(204).send(null)
